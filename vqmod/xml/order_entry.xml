@@ -1543,7 +1543,13 @@
 				<li><a href="<?php echo $return; ?>"><?php echo $text_return; ?></a></li>
 			]]></search>
 			<add><![CDATA[
-				<li><a href="<?php echo $order_entry; ?>"><?php echo $text_order_entry; ?></a></li>
+      <?php
+        $this->load->model('user/user');
+        $user_group_id = $this->model_user_user->getUser($this->user->getId());
+        $user_gid = $user_group_id['user_group_id'];
+        if($user_gid == '12' || $user_gid == '1') { ?>
+  				<li><a href="<?php echo $order_entry; ?>"><?php echo $text_order_entry; ?></a></li>
+       <?php } ?>
 			]]></add>
 		</operation>
 	</file>
