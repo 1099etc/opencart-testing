@@ -1,0 +1,936 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+  <id>Enhanced Customer Information v2.4 for OpenCart v1.5.5.x, v1.5.6.x</id>
+  <version>2.4</version>
+  <vqmver>2.0.0</vqmver>
+  <author>ADV Reports and Statistics (cmerry)</author>
+  <email>opencart.reports@gmail.com</email>
+  <website>http://www.opencartreports.com</website>
+  <file name="admin/controller/sale/customer.php">
+        <operation>
+            <search position="after"><![CDATA[
+    public function index() {
+            ]]></search>
+            <add><![CDATA[
+        $query = $this->db->query("SHOW TABLES LIKE '" . DB_PREFIX . "customer_track'");
+
+        if (!$query->num_rows) {
+            $this->db->query("CREATE TABLE `" . DB_PREFIX . "customer_track` (`customer_track_id` INT(10) NOT NULL AUTO_INCREMENT, `route` VARCHAR(100) NOT NULL, `ip_address` VARCHAR(15) NOT NULL, `customer_id` INT(11) NOT NULL, `current_url` TINYTEXT NOT NULL, `referrer` TINYTEXT NOT NULL, `agent_type` VARCHAR(200) NOT NULL, `access_time` DATETIME NOT NULL, PRIMARY KEY (`customer_track_id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;");
+        }
+            ]]></add>
+        </operation>  
+        <operation>
+            <search position="after"><![CDATA[
+      $this->data['customers'][] = array(
+            ]]></search>
+            <add trim="true"><![CDATA[
+        'total_orders'   => $result['total_orders'],
+        'total_value'    => $this->currency->format($result['total_value'], $this->config->get('config_currency')),
+            ]]></add>
+        </operation>  
+        <operation>
+            <search position="before"><![CDATA[
+    $this->data['button_approve'] = $this->language->get('button_approve');
+            ]]></search>
+            <add><![CDATA[
+    $this->data['column_total_value'] = $this->language->get('column_total_value');
+    $this->data['column_total_orders'] = $this->language->get('column_total_orders');
+            ]]></add>
+        </operation>
+        <operation>
+            <search position="after"><![CDATA[
+    $this->data['sort_date_added'] = $this->url->link('sale/customer', 'token=' . $this->session->data['token'] . '&sort=c.date_added' . $url, 'SSL');
+            ]]></search>
+            <add trim="true"><![CDATA[
+    $this->data['sort_total_orders'] = $this->url->link('sale/customer', 'token=' . $this->session->data['token'] . '&sort=total_orders' . $url, 'SSL');
+    $this->data['sort_total_value'] = $this->url->link('sale/customer', 'token=' . $this->session->data['token'] . '&sort=total_value' . $url, 'SSL');
+            ]]></add>
+        </operation>              
+        <operation>
+            <search position="after"><![CDATA[
+    protected function getForm() {
+            ]]></search>
+            <add><![CDATA[
+    $this->data['customer_id'] = isset($this->request->get['customer_id']); 
+      
+    if (isset($this->request->get['customer_id'])) {
+      $this->data['customer_id'] = $this->request->get['customer_id'];  
+      $this->data['url_product'] = $this->url->link('catalog/product/update', 'token=' . $this->session->data['token'] . '&product_id=', 'SSL');
+        
+      $this->data['orders'] = array();
+      $this->load->model('sale/order');
+      $cust_orders = $this->model_sale_order->getCustomerOrders($this->request->get['customer_id']);
+      
+        foreach ($cust_orders as $cust_order) {
+    
+          $this->data['orders'][] = array(
+            'order_id'      => $cust_order['order_id'],
+            'inv_no'      => $cust_order['invoice_prefix'] . $cust_order['invoice_no'],
+            'products'      => $cust_order['products'],
+            'os_name'       => $cust_order['os_name'],  
+            'store'       => $cust_order['store_name'], 
+            'serials'     => $cust_order['serials'],
+            'date_added'  => date($this->language->get('date_format_short'), strtotime($cust_order['date_added'])),
+            'total'       => $this->currency->format($cust_order['total'], $cust_order['currency_code'], $cust_order['currency_value']),
+            'total_value'   => $this->currency->format($cust_order['total_value'], $cust_order['currency_code'], $cust_order['currency_value'])
+          );
+        }
+      
+      $this->data['products'] = array();
+      $this->load->model('sale/order');
+      $this->load->model('tool/image');
+      $cust_products = $this->model_sale_order->getCustomerOrderedProducts($this->request->get['customer_id']);
+      
+        foreach ($cust_products as $cust_product) {
+
+        if ($cust_product['image'] && file_exists(DIR_IMAGE . $cust_product['image'])) {
+          $image_product = $this->model_tool_image->resize($cust_product['image'], 40, 40);
+        } else {
+          $image_product = $this->model_tool_image->resize('no_image.jpg', 40, 40);
+        }
+      
+        $this->load->model('catalog/product');
+        $category = $this->model_catalog_product->getProductCategories($cust_product['product_id']);
+        $manufacturer = $this->model_catalog_product->getProductManufacturers($cust_product['manufacturer_id']);  
+    
+          $this->data['products'][] = array(
+            'category'    => $category,
+            'manufacturer'  => $manufacturer,
+            'image'       => $image_product,
+            'sku'       => $cust_product['sku'],
+            'model'       => $cust_product['model'],
+            'name'        => $cust_product['name'],           
+            'quantity'    => $cust_product['quantity'],
+            'product_id'  => $cust_product['product_id'],
+            'oovalue'     => $cust_product['oovalue'],
+            'ooname'      => $cust_product['ooname'],
+            'total'       => $this->currency->format($cust_product['total'], $this->config->get('config_currency'))
+          );
+        }
+        
+      $this->load->model('catalog/category');
+      $this->data['categories'] = $this->model_catalog_category->getCategories(0);
+    
+      $this->load->model('catalog/manufacturer'); 
+      $this->data['manufacturers'] = $this->model_catalog_manufacturer->getManufacturers(); 
+    
+    
+      if (isset($this->request->get['filter_start_date'])) {
+        $start_date = urldecode($this->request->get['filter_start_date']);
+      } else {
+        $start_date = date("Y-m-d");
+      }
+    
+      if (isset($this->request->get['filter_end_date'])) {
+        $end_date = urldecode($this->request->get['filter_end_date']);
+      } else {
+        $end_date = date("Y-m-d");
+      }
+
+      $date_options = array(
+          'start_date'    =>  $start_date, 
+          'end_date'    =>  $end_date
+      );
+    
+      $this->data['date_options'] = $date_options;
+      
+      $this->data['customer_track'] = array();  
+      $this->load->model('sale/order');
+      $this->data['customer_track'] = $this->model_sale_order->getCustomerTrack($date_options, $this->request->get['customer_id']);
+      
+    if (isset($this->error['warning'])) {
+      $this->data['error_warning'] = $this->error['warning'];
+    } else {
+      $this->data['error_warning'] = '';
+    }
+
+    if (isset($this->request->get['delete_wishlist'])) {
+      $this->delete_wishlist();
+    }
+    
+    $cust_wishlists = $this->model_sale_order->getCustomerWishList($this->request->get['customer_id']);
+    $this->load->model('tool/image');     
+    $this->data['wishlist_products'] = array();
+      
+    foreach ($cust_wishlists as $cust_wishlist) {
+      if ($cust_wishlist['wishlist']) {
+      foreach (unserialize($cust_wishlist['wishlist']) as $product_id) {
+        $product = explode(":", $product_id);
+        $product_id = $product[0];
+        $query = $this->db->query("SELECT pd.name, p.model, p.sku, p.image AS image, p.product_id FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) WHERE p.product_id = '" . (int)$product_id . "' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND p.date_available <= NOW() AND p.status = '1'");
+
+        if (isset($query->row['name'])) {
+          $delete_wishlist = array();
+          $delete_wishlist[] = array(
+            'text' => $this->language->get('text_clear_wishlist'),
+            'href' => $this->url->link('sale/customer/update', 'token=' . $this->session->data['token'] . '&customer_id=' . $this->request->get['customer_id'] . '&delete_wishlist', 'SSL')
+          );
+          
+          if ($query->row['image'] && file_exists(DIR_IMAGE . $query->row['image'])) {
+            $image_wishlist = $this->model_tool_image->resize($query->row['image'], 40, 40);
+          } else {
+            $image_wishlist = $this->model_tool_image->resize('no_image.jpg', 40, 40);
+          } 
+          
+          $this->data['wishlist_products'][] = array(
+            'image'           => $image_wishlist,                                
+            'product_name'      => $query->row['name'],
+            'product_sku'     => $query->row['sku'],
+            'product_model'     => $query->row['model'],
+            'product_id'      => $query->row['product_id'],
+            'delete_wishlist'   => $delete_wishlist
+          );
+        } else {
+          $this->data['error_wishlist_product'] = $this->language->get('error_wishlist_product');
+        }
+      }
+      }   
+    }
+    
+    if (isset($this->request->get['clear_cart'])) {
+      $this->clear_cart();
+    }
+    
+    $cust_carts = $this->model_sale_order->getCustomerCart($this->request->get['customer_id']);
+    $this->load->model('tool/image');   
+    $this->data['cart_products'] = array();
+      
+    foreach ($cust_carts as $cust_cart) {
+      if ($cust_cart['cart']) {
+      foreach (unserialize($cust_cart['cart']) as $key => $quantity) {
+        $product = explode(":", $key);
+        $product_id = $product[0];
+        $query = $this->db->query("SELECT pd.name, p.model, p.sku, p.image AS image, p.product_id FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) WHERE p.product_id = '" . (int)$product_id . "' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND p.date_available <= NOW() AND p.status = '1'");
+      
+        $option_data = array();
+        if (isset($product[1])) {
+          $options = unserialize(base64_decode($product[1]));
+          foreach ($options as $product_option_id => $option_value) {
+            $option_query = $this->db->query("SELECT po.product_option_id, po.option_id, od.name, o.type FROM " . DB_PREFIX . "product_option po LEFT JOIN `" . DB_PREFIX . "option` o ON (po.option_id = o.option_id) LEFT JOIN " . DB_PREFIX . "option_description od ON (o.option_id = od.option_id) WHERE po.product_option_id = '" . (int)$product_option_id . "' AND po.product_id = '" . (int)$product_id . "' AND od.language_id = '" . (int)$this->config->get('config_language_id') . "'");
+            if ($option_query->num_rows) {
+              if ($option_query->row['type'] == 'select' || $option_query->row['type'] == 'radio') {
+                $option_value_query = $this->db->query("SELECT pov.option_value_id, ovd.name, pov.quantity, pov.subtract, pov.price, pov.price_prefix, pov.points, pov.points_prefix, pov.weight, pov.weight_prefix FROM " . DB_PREFIX . "product_option_value pov LEFT JOIN " . DB_PREFIX . "option_value ov ON (pov.option_value_id = ov.option_value_id) LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON (ov.option_value_id = ovd.option_value_id) WHERE pov.product_option_value_id = '" . (int)$option_value . "' AND pov.product_option_id = '" . (int)$product_option_id . "' AND ovd.language_id = '" . (int)$this->config->get('config_language_id') . "'");
+                if ($option_value_query->num_rows) {
+                  $option_data[] = array(
+                    'name'                    => $option_query->row['name'],
+                    'option_value'            => $option_value_query->row['name']
+                  );
+                }
+              } elseif ($option_query->row['type'] == 'checkbox' && is_array($option_value)) {
+                foreach ($option_value as $product_option_value_id) {
+                  $option_value_query = $this->db->query("SELECT pov.option_value_id, ovd.name, pov.quantity, pov.subtract, pov.price, pov.price_prefix, pov.points, pov.points_prefix, pov.weight, pov.weight_prefix FROM " . DB_PREFIX . "product_option_value pov LEFT JOIN " . DB_PREFIX . "option_value ov ON (pov.option_value_id = ov.option_value_id) LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON (ov.option_value_id = ovd.option_value_id) WHERE pov.product_option_value_id = '" . (int)$product_option_value_id . "' AND pov.product_option_id = '" . (int)$product_option_id . "' AND ovd.language_id = '" . (int)$this->config->get('config_language_id') . "'");
+                  if ($option_value_query->num_rows) {
+                    $option_data[] = array(
+                      'name'                    => $option_query->row['name'],
+                      'option_value'            => $option_value_query->row['name']
+                    );
+                  }
+                }
+              } elseif ($option_query->row['type'] == 'text' || $option_query->row['type'] == 'textarea' || $option_query->row['type'] == 'file' || $option_query->row['type'] == 'date' || $option_query->row['type'] == 'datetime' || $option_query->row['type'] == 'time') {
+                $option_data[] = array(
+                  'name'                    => $option_query->row['name'],
+                  'option_value'            => $option_value
+                );
+              }
+            }
+          }
+        } else {
+          $option_data[] = array(
+            'name'      => ""
+          );
+        }
+
+        if (isset($query->row['name'])) {
+          $clear_cart = array();
+          $clear_cart[] = array(
+            'text' => $this->language->get('text_clear_cart'),
+            'href' => $this->url->link('sale/customer/update', 'token=' . $this->session->data['token'] . '&customer_id=' . $this->request->get['customer_id'] . '&clear_cart', 'SSL')
+          );
+
+    
+          if ($query->row['image'] && file_exists(DIR_IMAGE . $query->row['image'])) {
+            $image_cart = $this->model_tool_image->resize($query->row['image'], 40, 40);
+          } else {
+            $image_cart = $this->model_tool_image->resize('no_image.jpg', 40, 40);
+          } 
+
+          $this->data['cart_products'][] = array(
+            'image'           => $image_cart,
+            'product_name'      => $query->row['name'],
+            'product_sku'     => $query->row['sku'],
+            'product_model'     => $query->row['model'],            
+            'product_id'      => $query->row['product_id'],
+            'product_options'   => $option_data,
+            'quantity'        => $quantity,
+            'clear_cart'        => $clear_cart
+          );
+        } else {
+          $this->data['error_cart_product'] = $this->language->get('error_cart_product');
+        }
+      }
+       }
+      }
+    }
+    
+    $this->data['text_confirm_reset'] = $this->language->get('text_confirm_reset'); 
+    
+    $this->data['column_order_id'] = $this->language->get('column_order_id');
+    $this->data['column_inv_id'] = $this->language->get('column_inv_id');   
+    $this->data['column_order_products'] = $this->language->get('column_order_products');
+    $this->data['column_order_status'] = $this->language->get('column_order_status');
+    $this->data['column_store'] = $this->language->get('column_store');
+    $this->data['column_serial'] = $this->language->get('column_serial');
+    $this->data['column_order_total'] = $this->language->get('column_order_total');
+    $this->data['column_total_value'] = $this->language->get('column_total_value'); 
+    $this->data['column_sku'] = $this->language->get('column_sku'); 
+    $this->data['column_model'] = $this->language->get('column_model'); 
+    $this->data['column_image'] = $this->language->get('column_image'); 
+    $this->data['column_product'] = $this->language->get('column_product'); 
+    $this->data['column_product_options'] = $this->language->get('column_product_options'); 
+    $this->data['column_product_quantity'] = $this->language->get('column_product_quantity');
+    $this->data['column_quantity'] = $this->language->get('column_quantity');
+    $this->data['column_prod_total'] = $this->language->get('column_prod_total');
+    $this->data['column_manufacturer'] = $this->language->get('column_manufacturer');
+    $this->data['column_category'] = $this->language->get('column_category'); 
+    $this->data['column_route'] = $this->language->get('column_route');
+    $this->data['column_ip_address'] = $this->language->get('column_ip_address');
+    $this->data['column_current_url'] = $this->language->get('column_current_url');
+    $this->data['column_access_date'] = $this->language->get('column_access_date');
+    $this->data['column_access_time'] = $this->language->get('column_access_time');
+    
+    $this->data['entry_date_start'] = $this->language->get('entry_date_start');
+    $this->data['entry_date_end'] = $this->language->get('entry_date_end');
+    
+      $this->data['button_add'] = $this->language->get('button_add');
+      $this->data['button_remove'] = $this->language->get('button_remove');
+    $this->data['button_filter'] = $this->language->get('button_filter');
+    $this->data['button_reset'] = $this->language->get('button_reset');
+
+    $this->data['tab_customer_history'] = $this->language->get('tab_customer_history');
+    $this->data['tab_customer_products'] = $this->language->get('tab_customer_products');
+    $this->data['tab_cart'] = $this->language->get('tab_cart'); 
+    $this->data['tab_wishlist'] = $this->language->get('tab_wishlist'); 
+    $this->data['tab_customer_track'] = $this->language->get('tab_customer_track'); 
+            ]]></add>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[
+    protected function validateForm() {
+            ]]></search>
+            <add><![CDATA[
+  public function delete_track() {
+    $this->load->language('sale/customer');
+    $this->load->model('sale/order');
+    $this->model_sale_order->deleteCustomerTrack($this->request->get['customer_id']);
+    $furl = '';
+    $this->redirect($this->url->link('sale/customer/update', 'token=' . $this->session->data['token'] . '&customer_id=' . $this->request->get['customer_id'] . $furl, 'SSL'));
+  }
+  
+    public function clear_cart() {
+    $this->load->language('sale/customer');
+    $this->load->model('sale/order');
+    $this->model_sale_order->clearCustomerCart($this->request->get['customer_id']);
+    $curl = '';
+    $this->redirect($this->url->link('sale/customer/update', 'token=' . $this->session->data['token'] . '&customer_id=' . $this->request->get['customer_id'] . $curl, 'SSL'));
+  }
+  
+    public function delete_wishlist() {
+    $this->load->language('sale/customer');
+    $this->load->model('sale/order');
+    $this->model_sale_order->deleteCustomerWishList($this->request->get['customer_id']);
+    $wurl = '';
+    $this->redirect($this->url->link('sale/customer/update', 'token=' . $this->session->data['token'] . '&customer_id=' . $this->request->get['customer_id'] . $wurl, 'SSL'));
+  } 
+            ]]></add>
+        </operation>    
+  </file>
+
+  <file name="admin/language/*/sale/customer.php">
+        <operation>
+            <search position="before"><![CDATA[
+?>
+            ]]></search>
+            <add><![CDATA[
+$_['text_confirm_reset']    = 'Are you sure to reset the log?';
+$_['text_clear_cart']     = 'Clear Cart';
+$_['text_clear_wishlist']   = 'Clear Wishlist';
+
+$_['column_order_id']         = 'Order ID';
+$_['column_inv_id']           = 'Invoice No.';
+$_['column_order_products']   = 'No. Products';
+$_['column_order_status']     = 'Order Status';
+$_['column_store']            = 'Store Name';
+$_['column_serial']           = 'Serial(s)';
+$_['column_order_total']      = 'Order Total';
+$_['column_total_value']      = 'Total Value';
+$_['column_total_orders']     = 'No. Orders';
+$_['column_image']            = 'Image';
+$_['column_sku']              = 'SKU';
+$_['column_model']            = 'Model';
+$_['column_product']          = 'Product';
+$_['column_product_options']  = 'Product Options';
+$_['column_product_quantity'] = 'Quantity';
+$_['column_quantity']         = 'Quantity';
+$_['column_prod_total']       = 'Total';
+$_['column_category']       = 'Category';
+$_['column_manufacturer']     = 'Manufacturer';
+$_['column_route']          = 'Page';
+$_['column_ip_address']       = 'IP Address<br><span style="font-size:10px;">(Browser Used)</span>';
+$_['column_current_url']    = 'Page URL<br><span style="color:#999;">Referrer Site</span>';
+$_['column_access_date']      = 'Visit Date';
+$_['column_access_time']      = 'Click Time';
+
+$_['tab_customer_history']    = 'Order History';
+$_['tab_customer_products']   = 'Purchased Products';
+$_['tab_cart']            = 'Shopping Cart';
+$_['tab_wishlist']        = 'Wishlist';
+$_['tab_customer_track']      = 'Customer Track';
+
+$_['entry_date_start']      = 'Date Start:';
+$_['entry_date_end']      = 'Date End:';
+
+$_['error_cart_product']    = 'Warning: There is a product in your customer\'s cart that is no longer in your product list!';
+$_['error_wishlist_product']  = 'Warning: There is a product in your customer\'s wishlist that is no longer in your product list!';
+            ]]></add>
+        </operation>
+  </file>
+
+  <file name="admin/model/catalog/product.php">
+        <operation>
+            <search position="before"><![CDATA[
+  public function getProductRelated($product_id) {
+            ]]></search>
+            <add><![CDATA[
+  public function getProductManufacturers($manufacturer_id) {
+    $product_manufacturer_data = array();
+    
+    $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "manufacturer WHERE manufacturer_id = '" . (int)$manufacturer_id . "'");
+    
+    foreach ($query->rows as $result) {
+      $product_manufacturer_data[] = $result['manufacturer_id'];
+    }
+
+    return $product_manufacturer_data;
+  }
+            ]]></add>
+        </operation>
+  </file>
+
+  <file name="admin/model/sale/customer.php">
+        <operation>
+            <search position="replace"><![CDATA[
+$sql = "SELECT *, CONCAT(c.firstname, ' ', c.lastname) AS name, cgd.name AS customer_group FROM " . DB_PREFIX . "customer c LEFT JOIN " . DB_PREFIX . "customer_group_description cgd ON (c.customer_group_id = cgd.customer_group_id) WHERE cgd.language_id = '" . (int)$this->config->get('config_language_id') . "'";
+            ]]></search>
+            <add trim="true"><![CDATA[
+$sql = "SELECT  *, CONCAT(c.firstname, ' ', c.lastname) AS name, cgd.name AS customer_group, (SELECT COUNT(o.order_id) FROM `" . DB_PREFIX . "order` o WHERE o.order_status_id > '0' AND o.customer_id = c.customer_id GROUP BY o.customer_id) AS total_orders, (SELECT SUM(o.total) FROM `" . DB_PREFIX . "order` o WHERE o.order_status_id > '0' AND o.customer_id = c.customer_id GROUP BY o.customer_id) AS total_value FROM " . DB_PREFIX . "customer c, " . DB_PREFIX . "customer_group_description cgd WHERE c.customer_group_id = cgd.customer_group_id AND cgd.language_id = '" . (int)$this->config->get('config_language_id') . "'";
+            ]]></add>
+        </operation>  
+        <operation>
+            <search position="replace"><![CDATA[
+      'c.date_added'
+            ]]></search>
+            <add trim="true"><![CDATA[
+      'c.date_added',
+      'total_orders',
+      'total_value'
+            ]]></add>
+        </operation>        
+  </file>
+    
+  <file name="admin/model/sale/order.php">
+        <operation>
+            <search position="after"><![CDATA[
+class ModelSaleOrder extends Model {
+            ]]></search>
+            <add><![CDATA[
+  public function getCustomerOrders($customer_id){
+    $sql = "SELECT o.customer_id, o.order_id, o.invoice_no, o.invoice_prefix, o.currency_code, o.currency_value, o.order_status_id, o.date_added, o.store_name, o.total, (SELECT group_concat(`key`, featurecode) FROM serials_order where o.order_id=serials_order.oid) AS serials, (SELECT SUM(op.quantity) FROM `" . DB_PREFIX . "order_product` op WHERE op.order_id = o.order_id GROUP BY op.order_id) AS products, (SELECT os.name FROM `" . DB_PREFIX . "order_status` os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS os_name, (SELECT SUM(o.total) FROM `" . DB_PREFIX . "order` o WHERE o.order_status_id > '0' AND o.customer_id = '" . $customer_id . "' GROUP BY o.customer_id) AS total_value FROM `" . DB_PREFIX . "order` o WHERE o.order_status_id > '0' AND o.customer_id = '" . $customer_id . "' GROUP BY o.order_id ORDER BY o.order_id DESC";
+    
+    $result = $this->db->query($sql);
+    return $result->rows;
+  }
+  
+  public function getCustomerOrderedProducts($customer_id){
+    $query = 'SET SESSION group_concat_max_len=150000'; 
+ 
+    mysql_query($query);
+    
+    $sql = "SELECT o.customer_id, o.order_id, o.currency_code, o.order_status_id, op.product_id, pd.name, op.model, qa.order_product_id, SUM(op.quantity) AS quantity, SUM(op.total + op.quantity * op.tax) AS total, p.sku, p.manufacturer_id, p.image AS image, options, oovalue, ooname FROM (SELECT oo.order_product_id, GROUP_CONCAT(product_option_value_id) AS options, GROUP_CONCAT(value SEPARATOR '<br>') AS oovalue, GROUP_CONCAT(name SEPARATOR ':<br>') AS ooname FROM `" . DB_PREFIX . "order_option` oo GROUP BY order_product_id) qa, `" . DB_PREFIX . "order_product` op, `" . DB_PREFIX . "order` o, `" . DB_PREFIX . "product` p, `" . DB_PREFIX . "product_description` pd WHERE pd.product_id = op.product_id AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND o.order_status_id > '0' AND o.customer_id = '" . $customer_id . "' AND op.order_id = o.order_id AND op.order_product_id = qa.order_product_id AND op.product_id = p.product_id GROUP BY options, op.product_id";
+    
+    $sql .= " UNION ALL SELECT o.customer_id, o.order_id, o.currency_code, o.order_status_id, op.product_id, pd.name, op.model, op.order_product_id, SUM(op.quantity) AS quantity, SUM(op.total + op.quantity * op.tax) AS total, p.sku, p.manufacturer_id, p.image AS image, '' AS options, '' AS oovalue, '' AS ooname FROM `" . DB_PREFIX . "order_product` op, `" . DB_PREFIX . "order` o, `" . DB_PREFIX . "product` p, `" . DB_PREFIX . "product_description` pd WHERE pd.product_id = op.product_id AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND o.order_status_id > '0' AND o.customer_id = '" . $customer_id . "' AND op.order_id = o.order_id AND op.product_id = p.product_id AND op.order_product_id NOT IN (SELECT order_product_id FROM " . DB_PREFIX . "order_option) GROUP BY op.product_id ORDER BY quantity DESC";
+    
+    $result = $this->db->query($sql);
+    return $result->rows;
+  }
+  
+  public function getCustomerTrack($date_options = array(), $customer_id) {
+    if(empty($date_options)) { return array(); }
+    $sql = "SELECT ct.route, ct.ip_address, ct.customer_id, ct.current_url, ct.referrer, ct.agent_type, ct.access_time FROM `" . DB_PREFIX . "customer_track` ct LEFT OUTER JOIN `" . DB_PREFIX . "customer` cus ON ct.customer_id = cus.customer_id WHERE ct.customer_id = '" . $customer_id . "'";
+    
+    if(isset($date_options['start_date']) && $date_options['start_date'] != '') {
+      $sql .= " AND DATE(ct.access_time) >=  '" . htmlentities($date_options['start_date']) . "'";
+    }
+    
+    if(isset($date_options['end_date']) && $date_options['end_date'] != '') {
+      $sql .= " AND DATE(ct.access_time) <= '" . htmlentities($date_options['end_date']) . "'";
+    }
+    
+    $sql .= " ORDER BY ct.access_time DESC";
+    
+    $query = $this->db->query($sql);
+  
+    return $query->rows;
+  } 
+
+  public function deleteCustomerTrack($customer_id) {
+    $this->db->query("DELETE FROM `" . DB_PREFIX . "customer_track` WHERE customer_id = '" . (int)$customer_id . "'");
+    return true;
+  }
+
+  public function getCustomerCart($customer_id) {
+    $query = $this->db->query("SELECT cart FROM " . DB_PREFIX . "customer  WHERE customer_id = '" . $customer_id . "'");
+    return $query->rows;
+  }
+
+  public function clearCustomerCart($customer_id) {
+    $query = $this->db->query("UPDATE " . DB_PREFIX . "customer SET cart = 'a:0:{}' WHERE customer_id = '" . (int)$customer_id . "'");
+    return true;
+  }
+
+  public function getCustomerWishList($customer_id) {
+    $query = $this->db->query("SELECT wishlist FROM " . DB_PREFIX . "customer  WHERE customer_id = '" . $customer_id . "'");
+    return $query->rows;
+  }
+
+  public function deleteCustomerWishList($customer_id) {
+    $query = $this->db->query("UPDATE " . DB_PREFIX . "customer SET wishlist = 'a:0:{}' WHERE customer_id = '" . (int)$customer_id . "'");
+    return true;
+  }
+            ]]></add>
+        </operation>
+  </file>
+  
+  <file name="admin/view/template/sale/customer_form.tpl">
+        <operation>
+            <search position="after"><![CDATA[
+          <div id="vtabs" class="vtabs"><a href="#tab-customer"><?php echo $tab_general; ?></a>
+            ]]></search>
+            <add><![CDATA[
+      <?php if ($customer_id) { ?>
+          <a href="#tab_customer_history"><?php echo $tab_customer_history; ?></a><a href="#tab_customer_products"><?php echo $tab_customer_products; ?></a><a href="#tab_cart"><?php echo $tab_cart; ?></a><a href="#tab_wishlist"><?php echo $tab_wishlist; ?></a><a href="#tab_customer_track"><?php echo $tab_customer_track; ?></a>
+          <?php } ?>
+            ]]></add>
+        </operation>
+        <operation>
+            <search position="before" offset="2"><![CDATA[
+        <div id="tab-history">
+            ]]></search>
+            <add><![CDATA[
+  <?php if ($customer_id) { ?>
+    <div id="tab_customer_history" class="vtabs-content">
+      <table class="list">
+      <thead>
+      <tr>
+        <td class="left"><?php echo $column_order_id; ?></td>
+        <td class="left"><?php echo $column_date_added; ?></td>  
+                <td class="left"><?php echo $column_inv_id; ?></td> 
+                <td class="left"><?php echo $column_order_status; ?></td>
+                <td class="left"><?php echo $column_serial; ?></td>  
+        <td class="right"><?php echo $column_order_total; ?></td>                         
+        </tr>
+                </thead>
+                <tbody>
+            <?php if ($orders) { ?>
+        <?php foreach($orders as $order){ ?>
+      <tr>
+        <td class="left"><a href="index.php?route=sale/order/info&token=<?php echo $token?>&order_id=<?php echo $order['order_id']; ?>" class="none"><?php echo $order['order_id']; ?></a></td>
+        <td class="left"><?php echo date("d M Y", strtotime(str_replace("/","-",$order['date_added']))); ?></td>  
+                <td class="left"><?php if ($order['inv_no']) { ?><?php echo $order['inv_no']; ?><?php } ?></td> 
+                <td class="left"><?php echo $order['os_name']; ?></td>
+                <td class="left"><?php echo str_replace(',','<br />',$order['serials']); ?></td>
+        <td class="right"><?php echo $order['total']; ?></td>                    
+        </tr>               
+              <?php } ?>
+              <tr>
+                <td class="right" colspan="5"><b><?php echo $column_total_value; ?></b></td>
+                <td class="right"><b><?php echo $order['total_value']; ?></b></td>              
+              </tr>   
+            <?php } else { ?>
+              <tr>
+                <td class="center" colspan="7"><?php echo $text_no_results; ?></td>
+              </tr>
+            <?php } ?>
+            </tbody>
+      </table>
+    </div>    
+    <div id="tab_customer_products" class="vtabs-content">
+      <table class="list">
+      <thead>
+      <tr>
+        <td class="center"><?php echo $column_image; ?></td>
+                <td class="left"><?php echo $column_sku; ?></td>
+                <td class="left"><?php echo $column_model; ?></td>                
+                <td class="left"><?php echo $column_product; ?></td>
+                <td class="left"><?php echo $column_category; ?></td>
+                <td class="left"><?php echo $column_manufacturer; ?></td>
+        <td class="right"><?php echo $column_quantity; ?></td>  
+        <td class="right"><?php echo $column_prod_total; ?></td>                          
+        </tr>
+                </thead>
+                <tbody>
+            <?php if ($products) { ?>
+      <?php foreach($products as $product){ ?>
+      <tr>
+              <td class="center"><img src="<?php echo $product['image']; ?>" style="padding: 1px; border: 1px solid #DDDDDD;" /></td>
+                <td class="left"><?php echo $product['sku']; ?></td>
+                <td class="left"><?php echo $product['model']; ?></td>                
+        <td class="left"><?php echo '<a href="' . $url_product . $product['product_id'] . '">' . $product['name'] . '</a>' ; ?>
+                <?php if ($product['oovalue']) { ?>
+                <table cellpadding="0" cellspacing="0" style="border:hidden;">
+                <tbody>
+                <tr>
+        <td><span style="font-size:11px;"><?php echo $product['ooname']; ?>:</span></td>
+                <td><span style="font-size:11px;"><?php echo $product['oovalue']; ?></span></td>
+                </tr>
+                </tbody>
+                </table>
+                <?php } ?></td>
+              <td class="left"><?php foreach ($categories as $category) { ?>
+                <?php if (in_array($category['category_id'], $product['category'])) { ?>
+                <?php echo $category['name'];?><br />
+                <?php } ?> <?php } ?></td>
+              <td class="left"><?php foreach ($manufacturers as $manufacturer) { ?>
+                <?php if (in_array($manufacturer['manufacturer_id'], $product['manufacturer'])) { ?>
+                <?php echo $manufacturer['name'];?>
+                <?php } ?> <?php } ?></td>                
+        <td class="right"><?php echo $product['quantity']; ?></td>
+        <td class="right"><?php echo $product['total']; ?></td>                    
+        </tr>
+              <?php } ?>
+              <?php } else { ?>
+              <tr>
+                <td class="center" colspan="8"><?php echo $text_no_results; ?></td>
+              </tr>
+              <?php } ?>
+            </tbody>
+      </table>
+    </div> 
+    <div id="tab_cart" class="vtabs-content">
+      <table class="list">
+      <thead>
+              <tr>
+          <td class="center" style="width:5%;"><?php echo $column_image; ?></td>
+          <td class="left" style="width:10%;"><?php echo $column_sku; ?></td>               
+          <td class="left" style="width:10%;"><?php echo $column_model; ?></td>                           
+          <td class="left" style="width:40%;"><?php echo $column_product; ?></td>
+          <td class="left" style="width:20%;"><?php echo $column_product_options; ?></td>
+          <td class="center" style="width:5%;"><?php echo $column_product_quantity; ?></td>              
+              </tr>
+            </thead>
+            <tbody>
+            <?php if ($cart_products) { ?>
+              <?php foreach ($cart_products as $cart_product){ ?>
+            <tr>
+              <td class="center" style="width:5%;"><img src="<?php echo $cart_product['image']; ?>" style="padding: 1px; border: 1px solid #DDDDDD;" /></td>
+                  <td class="left" style="width:10%;"><?php echo $cart_product['product_sku']; ?></td>
+                  <td class="left" style="width:10%;"><?php echo $cart_product['product_model']; ?></td>                  
+              <td class="left" style="width:40%;"><?php echo '<a href="' . $url_product . $cart_product['product_id'] . '">' . $cart_product['product_name'] . '</a>' ; ?></td>
+              <td class="left" style="width:20%;">
+            <?php if ($cart_product['product_options']) { ?>
+              <?php foreach ($cart_product['product_options'] as $product_option) { ?>
+              <?php if ($product_option['name'] != "") { ?>
+                  <?php echo $product_option['name']; ?>:&nbsp;<?php echo $product_option['option_value']; ?><br />
+              <?php } else { ?>
+                  <?php echo $product_option['name']; ?>
+              <?php } ?>
+            <?php } ?>
+            <?php } ?>
+          </td>
+              <td class="center" style="width:5%;"><?php echo $cart_product['quantity']; ?></td>                  
+            </tr>
+        <?php } ?>
+      <?php } else { ?>
+        <tr>
+            <td class="center" colspan="6"><?php echo $text_no_results; ?></td>
+        </tr>
+      <?php } ?>
+      </tbody>
+    </table>
+        <?php if ($cart_products) { ?>
+    <div style="background: #E7EFEF; border: 1px solid #C6D7D7; padding: 3px; margin-bottom: 15px;">
+      <table width="100%" cellspacing="0" cellpadding="6">
+        <tr>
+          <td>
+                    <?php foreach ($cart_product['clear_cart'] as $clear_cart) { ?>
+            <?php if ($this->user->hasPermission('modify', 'sale/customer')) {?>          
+            <a onclick="location = '<?php echo $clear_cart['href']; ?>';" class="button"><span><?php echo $clear_cart['text']; ?></span></a>      
+          <?php } ?>
+                    <?php } ?>
+          </td>
+        </tr>
+      </table>
+    </div>
+        <?php } ?> 
+        </div>         
+    <div id="tab_wishlist" class="vtabs-content">
+      <table class="list">
+      <thead>
+              <tr>
+            <td class="center" style="width:5%;"><?php echo $column_image; ?></td>
+            <td class="left" style="width:10%;"><?php echo $column_sku; ?></td>  
+            <td class="left" style="width:10%;"><?php echo $column_model; ?></td>                  
+                <td class="left" style="width:75%;"><?php echo $column_product; ?></td>              
+              </tr>
+            </thead>
+            <tbody>
+            <?php if ($wishlist_products) { ?>
+              <?php foreach ($wishlist_products as $wishlist_product){ ?>
+              <tr>
+                <td class="center" style="width:5%;"><img src="<?php echo $wishlist_product['image']; ?>" style="padding: 1px; border: 1px solid #DDDDDD;" /></td>
+                <td class="left" style="width:10%;"><?php echo $wishlist_product['product_sku']; ?></td>
+                <td class="left" style="width:10%;"><?php echo $wishlist_product['product_model']; ?></td>                   
+                <td class="left" style="width:75%;"><?php echo '<a href="' . $url_product . $wishlist_product['product_id'] . '">' . $wishlist_product['product_name'] . '</a>' ; ?></td>             
+              </tr>
+              <?php } ?>
+              <?php } else { ?>
+              <tr>
+                <td class="center" colspan="4"><?php echo $text_no_results; ?></td>
+              </tr>
+              <?php } ?>
+            </tbody>
+          </table>
+        <?php if ($wishlist_products) { ?>
+    <div style="background: #E7EFEF; border: 1px solid #C6D7D7; padding: 3px; margin-bottom: 15px;">
+      <table width="100%" cellspacing="0" cellpadding="6">
+        <tr>
+          <td>
+                    <?php foreach ($wishlist_product['delete_wishlist'] as $delete_wishlist) { ?>
+            <?php if ($this->user->hasPermission('modify', 'sale/customer')) {?>          
+            <a onclick="location = '<?php echo $delete_wishlist['href']; ?>';" class="button"><span><?php echo $delete_wishlist['text']; ?></span></a>
+                    <?php } ?>
+          <?php } ?>
+          </td>
+        </tr>
+      </table>
+    </div>
+        <?php } ?>           
+        </div> 
+    <div id="tab_customer_track" class="vtabs-content">
+    <div style="background: #E7EFEF; border: 1px solid #C6D7D7; padding: 3px; margin-bottom: 15px;">
+      <table width="100%" cellspacing="0" cellpadding="6">
+        <tr>
+          <td width="150">
+            <?php echo $entry_date_start; ?>
+            <br />
+            <input type="text" name="filter_start_date" value="<?php echo $date_options['start_date'];?>" id="filter_start_date" size="12" style="margin-top: 4px;" />
+          </td>
+          <td width="150">
+            <?php echo $entry_date_end; ?>
+            <br />
+            <input type="text" name="filter_end_date" value="<?php echo $date_options['end_date'];?>" id="filter_end_date" size="12" style="margin-top: 4px;" />
+          </td>
+          <td align="right">        
+          <a onclick="date_filter();" class="button"><span><?php echo $button_filter; ?></span></a>
+            <?php if ($this->user->hasPermission('modify', 'sale/customer')) {?>
+          &nbsp;&nbsp;<a onclick="track_reset();" class="button"><span><?php echo $button_reset;?></span></a>
+          <?php } ?>          
+          </td>
+        </tr>
+      </table>
+    </div>         
+    <table class="list">
+      <thead>
+        <tr>
+                  <td width="9%" class="left" nowrap="nowrap"><?php echo $column_ip_address; ?></td>
+          <td class="left"><?php echo $column_route; ?></td>
+          <td class="left"><?php echo $column_current_url; ?></td>
+          <td width="7%" class="center" nowrap="nowrap"><?php echo $column_access_date; ?></td>
+                    <td width="7%" class="center" nowrap="nowrap"><?php echo $column_access_time; ?></td>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if ($customer_track) { ?>
+        <?php foreach ($customer_track as $track) { ?>
+        <tr>
+          <td class="left" nowrap="nowrap">
+            <a onclick="window.open('http://www.geoiptool.com/en/?IP=<?php echo $track['ip_address']; ?>');"><?php echo $track['ip_address']; ?></a><br />
+                        <span style="font-size:10px;">(<?php echo $track['agent_type']; ?>)</span>
+          </td>
+          <td class="left"><?php echo $track['route']; ?>
+          </td>
+          <td class="left">
+            <a href="<?php echo str_replace('&amp;', '&',html_entity_decode($track['current_url'])); ?>" target="_blank">
+              <?php echo $track['current_url']; ?></a>
+            <?php if($track['referrer'] != ""){ ?><br />
+            <a href="<?php echo str_replace('&amp;', '&',html_entity_decode($track['referrer'])); ?>" title="<?php echo str_replace('&amp;', '&',html_entity_decode($track['referrer'])); ?>" target="_blank">
+              <span style="color:#666;"><?php echo $track['referrer']; ?></span></a>
+            <?php } ?>
+          </td>
+          <td class="center" nowrap="nowrap"><?php echo date('d M Y', strtotime($track['access_time'])); ?></td>
+          <td class="center" nowrap="nowrap"><?php echo date($this->language->get('time_format'), strtotime($track['access_time'])); ?></td>                    
+        </tr>
+        <?php } ?>
+        <?php } else { ?>
+        <tr>
+          <td class="center" colspan="5"><?php echo $text_no_results; ?></td>
+        </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+    </div>
+        <?php } ?>
+    ]]></add>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[
+<?php echo $footer; ?>
+            ]]></search>
+            <add><![CDATA[
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#filter_start_date').datepicker({dateFormat: 'yy-mm-dd'});
+    $('#filter_end_date').datepicker({dateFormat: 'yy-mm-dd'});
+  });
+</script> 
+<script type="text/javascript">
+  function track_reset() {
+    if(confirm("<?php echo $text_confirm_reset;?>") == false) return false;
+    var furl = 'index.php?route=sale/customer/delete_track&token=<?php echo $token; ?>&customer_id=<?php echo $customer_id; ?>';
+    location = furl;
+  }
+  
+  function date_filter() {
+    var furl = 'index.php?route=sale/customer/update&token=<?php echo $token; ?>&customer_id=<?php echo $customer_id; ?>';
+    
+    var filter_start_date = $("#filter_start_date").val();
+    if (filter_start_date) {
+      furl += '&filter_start_date=' + encodeURIComponent(filter_start_date);
+    }
+    
+    var filter_end_date = $("#filter_end_date").val();
+    if (filter_end_date) {
+      furl += '&filter_end_date=' + encodeURIComponent(filter_end_date);
+    }
+    location = furl;
+  }
+</script>
+            ]]></add>
+        </operation>        
+  </file>
+      
+  <file name="admin/view/template/sale/customer_list.tpl">
+        <operation error="skip">
+            <search position="before"><![CDATA[
+              <td class="left"><?php if ($sort == 'c.status') { ?>
+            ]]></search>
+            <add><![CDATA[
+              <td class="left"><?php if ($sort == 'total_orders') { ?>
+                <a href="<?php echo $sort_total_orders; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_total_orders; ?></a>
+                <?php } else { ?>
+                <a href="<?php echo $sort_total_orders; ?>"><?php echo $column_total_orders; ?></a>
+                <?php } ?></td>
+              <td class="left"><?php if ($sort == 'total_value') { ?>
+                <a href="<?php echo $sort_total_value; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_total_value; ?></a>
+                <?php } else { ?>
+                <a href="<?php echo $sort_total_value; ?>"><?php echo $column_total_value; ?></a>
+                <?php } ?></td> 
+            ]]></add>
+        </operation>
+        <operation error="skip">
+            <search position="before"><![CDATA[
+              <td><select name="filter_status">
+            ]]></search>
+            <add><![CDATA[
+              <td></td>
+              <td></td>  
+            ]]></add>
+        </operation>        
+        <operation error="skip">
+            <search position="replace"><![CDATA[
+              <td class="left"><?php echo $customer['name']; ?></td>
+            ]]></search>
+            <add><![CDATA[
+              <td class="left"><?php foreach ($customer['action'] as $action) { ?><a href="<?php echo $action['href']; ?>"><?php echo $customer['name']; ?></a><?php } ?></td>
+            ]]></add>
+        </operation>
+        <operation error="skip">
+            <search position="before"><![CDATA[
+              <td class="left"><?php echo $customer['status']; ?></td>
+            ]]></search>
+            <add><![CDATA[
+              <td class="left"><?php echo $customer['total_orders']; ?></td>
+              <td class="left"><?php echo $customer['total_value']; ?></td>   
+            ]]></add>
+        </operation>
+        <operation error="skip">
+            <search position="replace"><![CDATA[
+              <td class="center" colspan="10"><?php echo $text_no_results; ?></td>
+            ]]></search>
+            <add><![CDATA[
+              <td class="center" colspan="13"><?php echo $text_no_results; ?></td>
+            ]]></add>
+        </operation>            
+  </file>
+  
+  <file name="catalog/controller/common/header.php">
+        <operation>
+            <search position="after"><![CDATA[
+  protected function index() {
+            ]]></search>
+            <add><![CDATA[
+  if ($this->customer->isLogged()) {
+
+  if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != '') {
+    $route = $_SERVER['REQUEST_URI'];
+  } 
+  $ip_address = $_SERVER['REMOTE_ADDR'];
+  $customer_id = "";
+  if(isset($_SESSION['customer_id'])) {
+    $customer_id = $_SESSION['customer_id'];
+  }
+  
+  if (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] != '') {
+    $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") 
+              ? "https://" : "http://";
+    if( isset($_SERVER["SERVER_PORT"]) && $_SERVER["SERVER_PORT"] != "80") {
+        $current_url .= $_SERVER["HTTP_HOST"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+    } else {
+        $current_url .= $_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+    }
+  } else {
+    $current_url = "";
+  }
+  
+
+  if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != '') {
+    $referrer = $_SERVER['HTTP_REFERER'];
+  } else {
+    $referrer = "";
+  }
+  
+  if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        $agent_type = $_SERVER['HTTP_USER_AGENT'];
+        if (preg_match( "|Opera/ ([0-9].[0-9]{1,2})|",$agent_type,$matched)) {
+          $agent_type = "Opera " . $matched[1];
+        } elseif (preg_match("|MSIE ([0-9].[0-9]{1,2})|",$agent_type,$matched)) {
+          $agent_type = "IE " . $matched[1];
+        } elseif(preg_match("|Firefox/([0-9\.]+)|",$agent_type,$matched)) {
+          $agent_type = "Firefox " . $matched[1];
+        } elseif(preg_match("|Chrome/([0-9\.]+)|",$agent_type,$matched)) {
+          $agent_type = "Chrome " . $matched[1];
+        } elseif(preg_match("|Safari/([0-9\.]+)|",$agent_type,$matched)) {
+          $agent_type = "Safari " . $matched[1];
+        } else {
+          $agent_type = "Other";
+        }
+  } else {
+    $agent_type = '';
+  } 
+  
+  $query = $this->db->query("INSERT INTO " . DB_PREFIX . "customer_track (route, ip_address, customer_id, current_url, referrer, agent_type, access_time) VALUES ('" . $route . "', '" . htmlentities($ip_address) . "', '" . $customer_id  . "', '" . htmlentities($current_url) . "', '" . htmlentities($referrer) . "', '" . htmlentities($agent_type) . "', '" . date("Y/m/d H:i:s") . "')");
+  
+  }
+            ]]></add>
+        </operation>    
+  </file>
+</modification>

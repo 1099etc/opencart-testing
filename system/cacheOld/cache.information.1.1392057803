@@ -1,0 +1,45 @@
+a:6:{i:0;a:7:{s:14:"information_id";s:1:"4";s:6:"bottom";s:1:"1";s:10:"sort_order";s:1:"1";s:6:"status";s:1:"1";s:11:"language_id";s:1:"1";s:5:"title";s:9:"About AMS";s:11:"description";s:869:"&lt;p&gt;Advanced Micro Solutions was originally incorporated as Edmond Software, Inc. in 1985. Edmond Software, based in Edmond, Oklahoma, was started by a software engineer and a CPA that saw a need for a payroll/W-2/1099 program that would cover the entire spectrum of payroll related processing, from W-2/1099 preparation, to after-the-fact payroll, to live payroll, for small to large clients.&lt;/p&gt;
+
+&lt;p&gt;In 1986 the first version of the product was developed and marketed to accounting firms nationally. The company grew rapidly from two employees and a few hundred customers in 1986 to 18 employees with over 12,000 loyal customers today. The company has grown into a nationally respected payroll software company that continues to develop, improve and market one of the best-rated payroll software packages for professional tax preparers.&lt;/p&gt;
+";}i:1;a:7:{s:14:"information_id";s:1:"6";s:6:"bottom";s:1:"1";s:10:"sort_order";s:1:"2";s:6:"status";s:1:"1";s:11:"language_id";s:1:"1";s:5:"title";s:20:"Delivery Information";s:11:"description";s:44:"&lt;p&gt;
+	Delivery Information&lt;/p&gt;
+";}i:2;a:7:{s:14:"information_id";s:1:"8";s:6:"bottom";s:1:"0";s:10:"sort_order";s:1:"0";s:6:"status";s:1:"1";s:11:"language_id";s:1:"1";s:5:"title";s:4:"Home";s:11:"description";s:1419:"&lt;table style=&quot;width: 100%; border-collapse:collapse; border: 0px solid #d3d3d3; padding: 5px;&quot;&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td&gt;&lt;img alt=&quot;&quot; src=&quot;http://advancedmicrosolutions.net/image/data/AMS_Frontpage-Main_Graphic.png&quot; style=&quot;width: 300px; height: 323px;&quot; /&gt;&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table style=&quot;width: 100%; border-collapse:collapse; border: 1px solid #d3d3d3; padding: 5px;&quot;&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td&gt;&lt;img alt=&quot;2012 CPA Readers Choice Award&quot; src=&quot;http://advancedmicrosolutions.net/image/data/readerschoice2.png&quot; style=&quot;opacity: 0.9; width: 130px; height: 114px; float: left; margin: 5px;&quot; /&gt;&lt;/td&gt;
+			&lt;td&gt;&lt;span style=&quot;font-size: 12.727272033691406px;&quot;&gt;Voted #1 in 1099 &amp;amp; W-2 Compliance as well as Payroll in the CPA Practice Advisors Readers' Choice Awards. John thousands of satisfied customers - &lt;a href=&quot;index.php?route=product/category&amp;amp;path=62&quot;&gt;Click here to order!&lt;/a&gt;&lt;/span&gt;&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;style type=&quot;text/css&quot;&gt;
+  #content .breadcrumb { visibility: hidden; display: none; }
+  #content h1 { visibility: hidden; display: none; }
+  .buttons { visibility: hidden; display: none; }
+&lt;/style&gt;
+";}i:3;a:7:{s:14:"information_id";s:1:"9";s:6:"bottom";s:1:"0";s:10:"sort_order";s:1:"0";s:6:"status";s:1:"1";s:11:"language_id";s:1:"1";s:5:"title";s:16:"Laser Generation";s:11:"description";s:1238:"&lt;p&gt;&lt;img alt=&quot;&quot; src=&quot;http://advancedmicrosolutions.net/image/data/fullpageIcon-laser.png&quot; style=&quot;width: 200px; height: 192px;&quot; /&gt;By adding Laser Generation you can print most forms on plain white paper. No need to buy pre-printed forms.&lt;/p&gt;
+
+&lt;p&gt;The only forms you will need to purchase are 1099 Copy A forms and 1096 forms and any other forms that are not accepted as laser generated.&lt;/p&gt;
+
+&lt;p&gt;You can even print the W-2, W-2C, W-3, and W-3C Copy A forms, as well as 941, 940, and many other forms that the software supports on blank paper.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Some Features of Laser Generation&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+	&lt;li&gt;Prints form on blank paper (except for required pre-printed forms such as the 1099 Copy A and 1096 forms).&lt;/li&gt;
+	&lt;li&gt;Supports Windows compatible printers (virtuall all brands and models of laser printers and dot-matrix printers). However, for faster printing, we recommend laser printers that support PCL 5e or PCL 6 drivers, for example; the HP LaserJet series II and higher.&lt;/li&gt;
+	&lt;li&gt;Print Preview function allows support for many non-HP laser printers.&lt;/li&gt;
+&lt;/ul&gt;
+";}i:4;a:7:{s:14:"information_id";s:1:"3";s:6:"bottom";s:1:"1";s:10:"sort_order";s:1:"3";s:6:"status";s:1:"1";s:11:"language_id";s:1:"1";s:5:"title";s:14:"Privacy Policy";s:11:"description";s:38:"&lt;p&gt;
+	Privacy Policy&lt;/p&gt;
+";}i:5;a:7:{s:14:"information_id";s:1:"5";s:6:"bottom";s:1:"1";s:10:"sort_order";s:1:"4";s:6:"status";s:1:"1";s:11:"language_id";s:1:"1";s:5:"title";s:22:"Terms &amp; Conditions";s:11:"description";s:50:"&lt;p&gt;
+	Terms &amp;amp; Conditions&lt;/p&gt;
+";}}

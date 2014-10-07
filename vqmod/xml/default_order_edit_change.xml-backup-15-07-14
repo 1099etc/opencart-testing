@@ -1,0 +1,29 @@
+<modification>
+	<id>Order Entry - Change Default Edit Link</id>
+	<version>2.3.1</version>
+	<vqmver>2.4.1</vqmver>
+	<author>ACFD Development</author>
+	
+	<file name="admin/controller/common/home.php">
+		<operation error="skip">
+			<search position="replace"><![CDATA[
+				str_replace("info&","insert&",$action['href'])
+			]]></search>
+			<add><![CDATA[
+				str_replace("sale/order/info","sale/order_entry&type=default_edit",$action['href'])
+			]]></add>
+		</operation>
+	</file>
+	
+	<file name="admin/controller/sale/order.php">
+		<operation error="skip">
+			<search position="replace"><![CDATA[
+				'href' => $this->url->link('sale/order/update', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, 'SSL')
+			]]></search>
+			<add><![CDATA[
+				'href' => $this->url->link('sale/order_entry', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . '&type=default_edit', 'SSL')
+			]]></add>
+		</operation>
+	</file>
+	
+</modification>

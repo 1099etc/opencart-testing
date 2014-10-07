@@ -1,0 +1,248 @@
+<modification>
+
+  <id>DOB on registration form 1.5.6</id>
+  <version>1.0.0</version>
+  <vqmver>1.2.3</vqmver>
+  <author>Wayne Dunkley</author>
+
+
+  <!-- Add DOB field to form -->
+  <file name="catalog/view/theme/*/template/account/register.tpl">
+    <operation>
+      <search position="before"><![CDATA[
+      <h2><?php echo $text_your_password; ?></h2>
+      ]]></search>
+      <add><![CDATA[
+      <h2>How did you hear about us?</h2>
+      <div class="content">
+      <table class="form">
+        <tr>
+          <td><span class="required">*</span> How did you hear about us?</td>
+          <td>
+            <select name="referral">
+              <option value=''></option>
+              <option value='other'>Other</option>
+              <option value='referral'>Referral from a friend / associate</option>
+              <option value='previous'>I have used the software before</option>
+              <option value='nelco'>Nelco</option>
+              <option value='irs'>Internal Revenue Service</option>
+              <option value='cpa_practice_advisor_magazine'>CPA Practice Advisor Magazine</option>
+              <option value='cpapracticeadvisor.com'>CPAPracticeAdvisor.com</option>
+              <option value='yahoo'>Yahoo</option>
+              <option value='google'>Google</option>
+              <option value='bing'>Bing</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+    </div>      
+      ]]></add>
+    </operation>
+  </file>
+
+
+  <!-- Add to language file -->
+  <file name="catalog/language/english/account/register.php">
+    <operation>
+      <search position="after" index="1"><![CDATA[
+      $_['entry_email']          = 'E-Mail:';
+      ]]></search>
+      <add><![CDATA[
+      $_['entry_referral']          = 'How did you hear about us?';
+      ]]></add>
+    </operation>
+    <operation>
+      <search position="after" index="1"><![CDATA[
+      $_['error_email']          = 'E-Mail Address does not appear to be valid!';
+      ]]></search>
+      <add><![CDATA[
+      $_['error_referral']          = 'Please tell us how you heard about us.';
+      ]]></add>
+    </operation>
+  </file>
+
+
+  <file name="catalog/controller/account/register.php">
+    <operation>
+      <search position="after" index="1"><![CDATA[
+      $this->data['entry_email'] = $this->language->get('entry_email');
+      ]]></search>
+      <add><![CDATA[
+      $this->data['entry_referral'] = $this->language->get('entry_dob');
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="before" index="1"><![CDATA[
+      if (isset($this->error['telephone'])) {
+      ]]></search>
+      <add><![CDATA[
+      if (isset($this->error['dob'])) {
+        $this->data['error_referral'] = $this->error['referral'];
+      } else {
+        $this->data['error_referral'] = '';
+      }
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="before" index="1"><![CDATA[
+        if (isset($this->request->post['telephone'])) {
+      ]]></search>
+      <add><![CDATA[
+        if (isset($this->request->post['referral'])) {
+            $this->data['referral'] = $this->request->post['referral'];
+        } else {
+          $this->data['referral'] = '';
+        }
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="before" index="1"><![CDATA[
+      if ($this->model_account_customer->getTotalCustomersByEmail($this->request->post['email'])) {
+      ]]></search>
+      <add><![CDATA[
+      if ((utf8_strlen($this->request->post['referral']) == "")) {
+            $this->error['referral'] = $this->language->get('error_referral');
+        }
+      ]]></add>
+    </operation>
+  </file>
+  
+  <!-- ADD DATE OF BIRTH VIEW TO ADMIN AREA -->
+  <file name="admin/view/template/sale/customer_form.tpl">
+    <operation>
+      <search position="before" offset="2"><![CDATA[
+        <td>Private?</td>
+      ]]></search>
+      <add><![CDATA[
+        <tr>
+                  <td><span class="required">*</span> <?php echo $entry_referral; ?></td>
+                  <td><select name="referral">
+                    <?php echo $referral; 
+
+                      $referrers = array( 'other' => 'Other',
+                                          'referral' => 'Referral from a friend / associate',
+                                          'previous' => 'I have used the software before',
+                                          'nelco' => 'Nelco',
+                                          'irs' => 'Internal Revenue Service',
+                                          'cpa_practice_advisor_magazine' => 'CPA Practice Advisor Magazine',
+                                          'cpapracticeadvisor.com' => 'CPAPracticeAdvisor.com',
+                                          'yahoo' => 'Yahoo',
+                                          'google' => 'Google',
+                                          'bing' => 'Bing'
+                                         );
+                      foreach($referrers as $R => $V) {
+                        if($referral == $R) { echo "<option value='" . $R ."' selected>" . $V . "</option>"; }
+                        else {echo "<option value='" . $R ."'>" . $V . "</option>"; }
+                      }
+
+
+                    ?>
+
+                    </select>
+                    <?php if ($error_referral) { ?>
+                    <span class="error"><?php echo $error_referral; ?></span>
+                    <?php  } ?></td>
+                </tr>
+      ]]></add>
+    </operation>
+
+  </file>
+
+  <!-- Add to language file -->
+  <file name="admin/language/english/sale/customer.php">
+    <operation>
+      <search position="after" index="1"><![CDATA[
+      $_['entry_email']           = 'E-Mail:';
+      ]]></search>
+      <add><![CDATA[
+      $_['entry_referral']          = 'How did you hear about us?';
+      ]]></add>
+    </operation>
+    <operation>
+      <search position="after" index="1"><![CDATA[
+      $_['error_email']           = 'E-Mail Address does not appear to be valid!';
+      ]]></search>
+      <add><![CDATA[
+      $_['error_referral']          = 'We require a referral';
+      ]]></add>
+    </operation>
+  </file>
+
+
+  <file name="admin/controller/sale/customer.php">
+    <operation>
+      <search position="after"><![CDATA[
+        public function index() {
+      ]]></search>
+      <add><![CDATA[
+        //Check and add `referral` column to `customer` table
+        $query = $this->db->query("DESCRIBE ".DB_PREFIX."customer referral");
+        if (!$query->num_rows) { 
+          $this->db->query("ALTER TABLE `" . DB_PREFIX . "customer` ADD `referral` TEXT NULL AFTER `email`");
+        }
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="after" index="1"><![CDATA[
+        $this->data['entry_email'] = $this->language->get('entry_email');
+      ]]></search>
+      <add><![CDATA[
+      $this->data['entry_referral'] = $this->language->get('entry_referral');
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="before" index="1"><![CDATA[
+        if (isset($this->error['telephone'])) {
+      ]]></search>
+      <add><![CDATA[
+      if (isset($this->error['referral'])) {
+        $this->data['error_dob'] = $this->error['referral'];
+      } else {
+        $this->data['error_referral'] = '';
+      }
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="before" index="1"><![CDATA[
+        if (isset($this->request->post['telephone'])) {
+      ]]></search>
+      <add><![CDATA[
+        if (isset($this->request->post['referral'])) {
+              $this->data['referral'] = $this->request->post['referral'];
+          } elseif (isset($customer_info)) { 
+          $this->data['referral'] = $customer_info['referral'];
+        } else {
+              $this->data['referral'] = '';
+          }
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="before" index="1"><![CDATA[
+        if ((utf8_strlen($this->request->post['telephone']) < 3) || (utf8_strlen($this->request->post['telephone']) > 32)) {
+      ]]></search>
+      <add><![CDATA[
+        if ((utf8_strlen($this->request->post['referral']) == "")) {
+              $this->error['referral'] = $this->language->get('error_referral');
+          }
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="after" index="1"><![CDATA[  
+        'email'          => $result['email'],
+      ]]></search>
+      <add><![CDATA[
+        'referral'          => $result['referral'],
+      ]]></add>
+    </operation>
+  </file>
+
+</modification>
+

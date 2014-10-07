@@ -1,0 +1,182 @@
+<modification>
+	<id>AMS Alerts</id>
+	<version>1.5.x</version>
+	<vqmver>2.X</vqmver>
+	<author>Advanced Micro Solutions - John LeVan</author>
+
+  <file name="admin/view/template/sale/order_info.tpl">
+    <operation>
+      <search position="after" offset="1"><![CDATA[<a href="#tab-fraud"><?php echo $tab_fraud; ?></a>]]></search>
+      <add><![CDATA[<a href="#tab-alerts">Alerts</a>]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA[<div id="tab-history" class="vtabs-content">]]></search>
+      <add><![CDATA[
+        <div id="tab-alerts" class="vtabs-content">
+          <div class="alert_header"><b>Add new alert to this order</b></div>
+          <div id="alert_form">
+            <form action='index.php?route=sale/alert/addAlert&token=<?php echo $this->request->get['token']; ?>' method='post' id='alert_form'>
+            <input type='hidden' name='route' value="sale/alert/addAlert" />
+            <input type='hidden' name='token' value="<?php echo $this->request->get['token']; ?>" />
+            <input type='hidden' name='returnURL' value="<?php echo $this->request->get['route']; ?>" />
+            <input type='hidden' name='order_id' value="<?php echo $order_id; ?>" />
+              <table border='0'>
+                <tr><td>Alert Title</td><td><input type='text' name='alert_title' id='alert_title' /></td>
+                    <td>Severity</td>
+                    <td><select name='alert_severity' id='alert_severity'>
+                          <option value='1' class='severity_1'>1</option>
+                          <option value='2' class='severity_2'>2</option>
+                          <option value='3' class='severity_3'>3</option>
+                          <option value='4' class='severity_4'>4</option>
+                          <option value='5' class='severity_5'>5</option>
+                          <option value='6' class='severity_6'>6</option>
+                          <option value='7' class='severity_7'>7</option>
+                          <option value='8' class='severity_8'>8</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr><td>Message</td><td colspan='3'><textarea name='alert_message' id='alert_message' rows=10 cols=75></textarea></td></tr>
+                <tr><td colspan='4' style='text-align: center'><input type='submit' value='Add Alert' /></td></tr>
+              </table>
+            </form>
+          </div>
+
+          <div class="alert_header"><b>Alerts currently on this order.</b></div>
+          <div id="current_alerts">
+            <table border='0' cellspacing='1' cellpadding='5' width='100%'>
+              <tr>
+                <td style='border-bottom: 1px solid black; width:50px;'>Alert ID</td>
+                <td style='border-bottom: 1px solid black;'>Title</td>
+                <td style='border-bottom: 1px solid black; width:50px;'>Severity</td>
+                <td style='border-bottom: 1px solid black;'>Message</td>
+                <td style='border-bottom: 1px solid black;'>Date Created</td>
+                <td style='border-bottom: 1px solid black;'>Created By</td>
+                <td style='border-bottom: 1px solid black;'>Actions</td>
+              </tr>
+
+              <?php
+                $this->load->model('sale/alert');
+                $this->load->model('user/user');
+                $alerts = $this->model_sale_alert->getOrderAlerts($order_id);
+                foreach($alerts as $alert) {
+                  echo "<tr>";
+                  echo "<td>" . $alert['alert_id'] . "</td>";
+                  echo "<td>" . $alert['title'] . "</td>";
+                  echo "<td class='severity_" . $alert['severity'] . "'>" . $alert['severity'] . "</td>";
+                  echo "<td>" . $alert['message'] . "</td>";
+                  echo "<td>" . date('F j, o h:i',strtotime($alert['date_added'])) . "</td>";
+                  echo "<td>" . $this->model_user_user->getUser($alert['user_id'])['username'] . "</td>";
+                  echo "<td>[ <a href='index.php?route=sale/alert/deleteAlert&token=" . $this->request->get['token'] . "&alert_id=" . $alert['alert_id'] . "&returnURL=" . $this->request->get['route'] . "&order_id=" . $this->request->get['order_id'] . "'>delete</a> ]</td>";
+                  echo "</tr>";
+                }
+              ?>
+            </table>
+          </div>
+        </div>
+      ]]></add>
+    </operation>
+
+  </file>
+
+  <file name="admin/view/template/sale/customer_form.tpl">
+    <operation>
+      <search position="after"><![CDATA[<div id="vtabs" class="vtabs"><a href="#tab-customer"><?php echo $tab_general; ?></a>]]></search>
+      <add><![CDATA[
+      <?php if ($customer_id) { ?>
+        <a href="#tab_customer_alerts">Alerts</a>
+      <?php } ?>
+      ]]></add>
+    </operation>
+    <operation>
+      <search position="before" offset="2"><![CDATA[<div id="tab-history">]]></search>
+      <add><![CDATA[
+      <?php if(isset($this->request->get['customer_id'])) { ?>
+        <div id="tab_customer_alerts" class="vtabs-content">
+          <div class="alert_header"><b>Add new alert to this customer</b></div>
+          <div id="alert_form">
+            <form action='index.php?route=sale/alert/addAlert&token=<?php echo $this->request->get['token']; ?>' method='post' id='alert_form'>
+            <input type='hidden' name='route' value="sale/alert/addAlert" />
+            <input type='hidden' name='token' value="<?php echo $this->request->get['token']; ?>" />
+            <input type='hidden' name='returnURL' value="<?php echo $this->request->get['route']; ?>" />
+            <input type='hidden' name='customer_id' value="<?php echo $customer_id; ?>" />
+              <table border='0'>
+                <tr><td>Alert Title</td><td><input type='text' name='alert_title' id='alert_title' /></td>
+                    <td>Severity</td>
+                    <td><select name='alert_severity' id='alert_severity'>
+                          <option value='1' class='severity_1'>1</option>
+                          <option value='2' class='severity_2'>2</option>
+                          <option value='3' class='severity_3'>3</option>
+                          <option value='4' class='severity_4'>4</option>
+                          <option value='5' class='severity_5'>5</option>
+                          <option value='6' class='severity_6'>6</option>
+                          <option value='7' class='severity_7'>7</option>
+                          <option value='8' class='severity_8'>8</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr><td>Message</td><td colspan='3'><textarea name='alert_message' id='alert_message' rows=10 cols=75></textarea></td></tr>
+                <tr><td colspan='4' style='text-align: center'><input type='submit' value='Add Alert' onClick="$('#alert_form').submit()" /></td></tr>
+              </table>
+            </form>
+          </div>
+
+          <div class="alert_header"><b>Alerts currently on this order.</b></div>
+          <div id="current_alerts">
+            <table border='0' cellspacing='1' cellpadding='5' width='100%'>
+              <tr>
+                <td style='border-bottom: 1px solid black; width:50px;'>Alert ID</td>
+                <td style='border-bottom: 1px solid black;'>Title</td>
+                <td style='border-bottom: 1px solid black; width:50px;'>Severity</td>
+                <td style='border-bottom: 1px solid black;'>Message</td>
+                <td style='border-bottom: 1px solid black;'>Date Created</td>
+                <td style='border-bottom: 1px solid black;'>Created By</td>
+                <td style='border-bottom: 1px solid black;'>Actions</td>
+              </tr>
+
+              <?php
+                $this->load->model('sale/alert');
+                $this->load->model('user/user');
+                $alerts = $this->model_sale_alert->getCustomerAlerts($customer_id);
+                foreach($alerts as $alert) {
+                  echo "<tr>";
+                  echo "<td>" . $alert['alert_id'] . "</td>";
+                  echo "<td>" . $alert['title'] . "</td>";
+                  echo "<td class='severity_" . $alert['severity'] . "'>" . $alert['severity'] . "</td>";
+                  echo "<td>" . $alert['message'] . "</td>";
+                  echo "<td>" . date('F j, o h:i',strtotime($alert['date_added'])) . "</td>";
+                  echo "<td>" . $this->model_user_user->getUser($alert['user_id'])['username'] . "</td>";
+                  echo "<td>[ <a href='index.php?route=sale/alert/deleteAlert&token=" . $this->request->get['token'] . "&alert_id=" . $alert['alert_id'] . "&returnURL=" . $this->request->get['route'] . "&customer_id=" . $this->request->get['customer_id'] . "'>delete</a> ]</td>";
+                  echo "</tr>";
+                }
+              ?>
+            </table>
+          </div>
+        </div>
+      <?php } ?>
+      ]]></add>
+    </operation>
+  </file>
+
+
+
+  <file name='admin/controller/sale/customer.php'>
+    <operation>
+      <search position="before"><![CDATA[if($this->model_sale_customer->editCustomer($this->request->get['customer_id'], $this->request->post)) {]]></search>
+      <add><![CDATA[
+        if(isset($this->request->post['alert_message']) && strlen($this->request->post['alert_message']) > 2) {
+          $this->load->model('sale/alert');
+          $this->load->model('user/user');
+          $user_id = $this->user->getId();
+          isset($this->request->post['alert_message']) ? $message = $this->request->post['alert_message'] : $message = "";
+          isset($this->request->post['alert_title'])   ? $title   = $this->request->post['alert_title']   : $title = "";
+
+          $this->model_sale_alert->createCustomerAlert($this->request->post['customer_id'],$this->db->escape($message),$this->request->post['alert_severity'], $this->db->escape($title), $user_id);
+        }
+      ]]></add>
+    </operation>
+  </file>
+
+
+
+</modification>

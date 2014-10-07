@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+	<id>Serial key module for Opencart</id>
+	<version>1.0.0</version>
+	<vqmver>1.0.8</vqmver>
+	<author>Jay Gilford - jay@jaygilford.com</author>
+
+	<!-- START FILES -->
+
+	<!-- START ADD MENU TO HEADER -->
+	<file name="admin/controller/common/header.php">
+		<operation>
+			<search position="after"><![CDATA[$this->data['text_zone'] = $this->language->get('text_zone');]]></search>
+			<add><![CDATA[$this->data['text_serial'] = $this->language->get('text_serial');]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[$this->data['zone'] =]]></search>
+			<add><![CDATA[$this->data['serial'] = HTTPS_SERVER . 'index.php?route=catalog/serial&token=' . $this->session->data['token'];]]></add>
+		</operation>
+	</file>
+
+	<file name="admin/language/english/common/header.php">
+		<operation>
+			<search position="after"><![CDATA[$_['text_zone']]]></search>
+			<add><![CDATA[$_['text_serial']            = 'Serial Keys';]]></add>
+		</operation>
+	</file>
+
+	<file name="admin/view/template/common/header.tpl">
+		<operation>
+			<search position="after"><![CDATA[<li><a href="<?php echo $information; ?>"><?php echo $text_information; ?></a></li>]]></search>
+			<add><![CDATA[<li><a href="<?php echo $serial; ?>"><?php echo $text_serial; ?></a></li>]]></add>
+		</operation>
+	</file>
+	<!-- END ADD MENU TO HEADER -->
+
+
+
+	<!-- START ADMIN ORDERS CHANGES -->
+	<file name="admin/controller/sale/order.php">
+		<operation>
+			<search position="after" index="2"><![CDATA[$this->data['tab_shipping'] = $this->language->get('tab_shipping');]]></search>
+			<add><![CDATA[			$this->data['text_serial_keys'] = $this->language->get('text_serial_keys');
+			$this->data['text_add_serials'] = $this->language->get('text_add_serials');
+			$this->data['text_no_serials'] = $this->language->get('text_no_serials');
+
+			$this->load->model('catalog/serial');
+			$this->document->addScript('view/javascript/jquery/jquery.jeditable.mini.js');
+			$this->document->addScript('view/javascript/jquery/serials.js');]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[=> $product['product_id'],]]></search>
+			<add><![CDATA[					'serials'		   => $this->model_catalog_serial->getSerialsByProduct($product['order_product_id']),
+			              					'featurecodes' => $this->model_catalog_serial->getFeatureCodesByProduct($product['order_product_id']),]]></add>
+		</operation>
+	</file>
+
+	<file name="admin/model/sale/order.php">
+		<operation>
+			<search position="after"><![CDATA[function deleteOrder(]]></search>
+			<add><![CDATA[
+		$this->load->model('catalog/serial');
+		$this->model_catalog_serial->restoreOrderSerials($order_id);
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="admin/language/english/sale/order.php">
+		<operation>
+			<search position="after"><![CDATA[text_wait]]></search>
+			<add><![CDATA[$_['text_serial_keys']     = 'Serial Keys purchased:';
+$_['text_add_serials']     = 'Add Serial Keys to product:';
+$_['text_no_serials']      = 'No serial keys for this product';]]></add>
+		</operation>
+	</file>
+
+
+
+  <file name="admin/language/english/sale/order.php">
+    <operation>
+      <search position="before"><![CDATA[$_['column_action']]]></search>
+      <add><![CDATA[$_['column_serial']                           = 'Serial';]]></add>
+    </operation>
+  </file>
+
+  <file name="admin/controller/sale/order.php">
+    <operation>
+      <search position="after"><![CDATA[$this->data['column_status'] = $this->language->get('column_status');]]></search>
+      <add><![CDATA[$this->data['column_serial'] = $this->language->get('column_serial');]]>
+      </add>
+    </operation>
+ 
+  </file>
+
+
+
+
+
+  <file name="admin/view/template/sale/order_list.tpl">
+    <operation>
+      <search position="before"><![CDATA[<td class="right"><?php if ($sort == 'o.total') { ?>]]></search>
+      <add><![CDATA[
+                <td class="left"><?php echo $column_serial; ?></td>
+           ]]>
+      </add>
+    </operation>
+    <operation>
+      <search position="before"><![CDATA[<input type="text" name="filter_total" value="<?php echo $filter_total; ?>" size="4" style="text-align: right;" /></td>]]></search>
+      <add><![CDATA[<td align="left"><input type="text" name="filter_serial" class='uppercase' value="<?php echo $filter_serial; ?>" size="10" style="text-align: right;" /></td>]]></add>
+    </operation>
+    <operation>
+      <search position="before"><![CDATA[var filter_total = $('input[name=\'filter_total\']').attr('value');]]></search>
+      <add><![CDATA[var filter_serial = $('input[name=\'filter_serial\']').attr('value');
+  if (filter_serial != '*') {
+    url += '&filter_serial=' + encodeURIComponent(filter_serial);
+  }
+      ]]></add>
+    </operation>
+
+
+    <operation>
+      <search position="before"><![CDATA[<?php echo $order['total']; ?></td>]]></search>
+      <add><![CDATA[<td class="right processing_id<?php echo $order['order_processing_status_id']; ?>">
+
+<?php 
+  if(substr_count($order['serial'], ',') > 0) {
+    // Make it collapsable.
+?>
+    <p class='expanderHeading' style='margin:0px; padding:0px'>[ Contains Multiple Serials - Click to Expand / Collapse ]</p>
+    <div class='expanderContent'>
+      <?php echo str_replace(",","<br />",$order['serial']); ?>
+    </div>
+
+<?php
+  }
+  else {
+    echo str_replace(",","<br />",$order['serial']); 
+  }
+?>
+
+</td>]]></add>
+    </operation>
+  </file>
+
+
+
+
+
+  <file name="admin/model/sale/order.php">
+    <operation>
+      <search position="before"><![CDATA[public function getOrderProducts($order_id) {]]></search>
+      <add><![CDATA[  public function getOrderSerials($order_id) {
+    $query = $this->db->query("SELECT `key` FROM " . DB_PREFIX . "serials_order WHERE oid ='" . (int)$order_id . "'");
+    return $query->rows;
+  }
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="after"><![CDATA[$sort_data = array(]]></search>
+      <add><![CDATA['key',]]></add>
+    </operation>
+
+    <operation>
+      <search position="replace"><![CDATA[$sql = "SELECT o.order_id, CONCAT(o.firstname, ' ', o.lastname) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS status, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified FROM `" . DB_PREFIX . "order` o";]]></search>
+      <add><![CDATA[$sql = "SELECT o.order_id, o.customer_id, CONCAT(o.firstname, ' ', o.lastname) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS status, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, o.shipping_method, o.order_processing_status_id, (SELECT GROUP_CONCAT(`key`) from " . DB_PREFIX . "serials_order WHERE o.order_id = " . DB_PREFIX . "serials_order.oid) as `key` FROM `" . DB_PREFIX . "order` o";]]></add>
+    </operation>
+
+
+    <operation>
+      <search position="after" offset="2"><![CDATA[$sql .= " AND o.total = '" . (float)$data['filter_total'] . "'";]]></search>
+      <add><![CDATA[    if (!empty($data['filter_serial'])) {
+        $sql .= " HAVING `key` LIKE '%" . $this->db->escape($data['filter_serial']) . "%'";
+      } ]]></add>
+    </operation>
+  </file>
+
+
+  <file name="admin/controller/sale/order.php">
+    <operation>
+      <search position="after"><![CDATA['order_id'      => $result['order_id'],]]></search>
+      <add><![CDATA[ 'serial'      => $result['key'],]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA[if (isset($this->request->get['filter_total'])) {]]></search>
+      <add><![CDATA[if (isset($this->request->get['filter_serial'])) {
+      $filter_serial = $this->request->get['filter_serial'];
+      $this->data['filter_serial'] = $this->request->get['filter_serial'];
+    } else {
+      $filter_serial = '';
+      $this->data['filter_serial'] = '';
+    }]]></add>
+    </operation>
+<!--
+    <operation>
+      <search position="before" offset="2"><![CDATA[$url .= '&filter_total=' . $this->request->get['filter_total'];]]></search>
+      <add><![CDATA[if (isset($this->request->get['filter_serial'])) {
+      $url .= '&filter_serial=' . $this->request->get['filter_serial'];
+      $filter_serial = $this->request->get['filter_serial'];
+    }]]></add>
+    </operation>
+-->
+    <operation>
+      <search position="before"><![CDATA['filter_order_id'        => $filter_order_id,]]></search>
+      <add><![CDATA['filter_serial'        => $filter_serial,]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA['total'         => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),]]></search>
+      <add><![CDATA[ 'serial'      => $result['key'],]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA['total'         => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),]]></search>
+      <add><![CDATA['order_processing_status_id' => $result['order_processing_status_id'],]]></add>
+    </operation>
+
+  </file>
+
+<!-- #################################################### -->
+
+
+
+
+
+
+
+
+	<file name="admin/view/template/sale/order_info.tpl">
+		<operation>
+			<search position="before"><![CDATA[<?php foreach ($products as $product) { ?>]]></search>
+			<add><![CDATA[<div id="order_id" style="display: none;"><?php echo $order_id; ?></div>
+<div id="token" style="display: none;"><?php echo $token; ?></div>]]></add>
+		</operation>
+		<operation>
+			<search position="after" offset="3"><![CDATA[<?php echo $totals['text']; ?>]]></search>
+			<add><![CDATA[           
+
+<?php foreach($products as $product) { ?>
+ <tr style="background-color: #f8f8f8;">
+            	<td>&nbsp;</td>
+                <td class="right"><strong><?php echo $text_serial_keys; ?></strong></td>
+                <td colspan="4" id="serials_list_<?php echo $product['order_product_id']; ?>">
+<?php if($product['serials']) : ?>
+<?php foreach($product['serials'] as $k => $serial): ?>
+
+<?php $generate_keycode_from = $serial . $product['featurecodes'][$k] ?>
+<?php $keyCode = $this->model_catalog_serial->generate_keycode($generate_keycode_from); ?>
+
+
+					<div style="padding: 1px;" rel="<?php echo $k; ?>" style="font-family: monospace;">
+              <span><?php echo $serial . "</span>" . $product['featurecodes'][$k] . " <b>KeyCode: </b>" . $keyCode; ?>
+              <?php if(strpos($product['model'],'upg-') === FALSE) { ?>
+                <img src="view/image/delete.png" class="serialRemove" alt="" />
+              <?php } ?>
+            </div>
+  <?php endforeach; ?>
+  <?php else: ?>
+            <div id="no_serials_<?php echo $product['order_product_id']; ?>"><?php echo $text_no_serials; ?></div>
+  <?php endif; ?>
+          </td>
+              </tr>
+
+            <?php if(strpos($product['model'],'upg-') === FALSE) { ?>
+              <tr style="background-color: #f8f8f8;">
+                <td>&nbsp;</td>
+                <td class="right">
+                  <?php if(strpos($product['model'],'upg-') === FALSE) { ?>
+                    <?php echo $text_add_serials; ?>
+                  <?php } ?>
+                </td>
+                <td colspan="4"><div style="padding: 5px 1px 1px 1px;">
+                  <?php if(strpos($product['model'],'upg-') === FALSE) { ?>
+                    <input id="add_serial_<?php echo $product['order_product_id']; ?>" type="text" /> <img src="view/image/add.png" class="serialAdd" rel="<?php echo $product['order_product_id']; ?>" alt="" />
+                  <?php } ?>
+                </div></td>
+        </tr>
+      <?php } ?>
+<?php } ?>
+]]></add>
+      </operation>
+    </file>
+
+    <!-- END ADMIN ORDERS CHANGES -->
+    
+    
+    
+    <!-- START ADMIN SETTINGS TAB CHANGES -->
+    <file name="admin/controller/setting/setting.php">
+      <operation>
+        <search position="before"><![CDATA[$this->data['tab_server']]]></search>
+        <add><![CDATA[		$this->data['tab_serial'] = $this->language->get('tab_serial');
+      $this->data['entry_threshold'] = $this->language->get('entry_threshold');
+      $this->data['entry_email_admin'] = $this->language->get('entry_email_admin');
+      $this->data['entry_restore_deleted'] = $this->language->get('entry_restore_deleted');
+        
+      if (isset($this->request->post['config_serial_threshold'])) {
+        $this->data['config_serial_threshold'] = $this->request->post['config_serial_threshold'];
+      } else {
+        $this->data['config_serial_threshold'] = $this->config->get('config_serial_threshold');
+      }
+        
+      if (isset($this->request->post['config_serial_email_admin'])) {
+        $this->data['config_serial_email_admin'] = (int)$this->request->post['config_serial_email_admin'];
+      } else {
+        $this->data['config_serial_email_admin'] = (int)$this->config->get('config_serial_email_admin');
+      }
+        
+      if (isset($this->request->post['config_serial_restore_deleted'])) {
+        $this->data['config_serial_restore_deleted'] = (int)$this->request->post['config_serial_restore_deleted'];
+      } else {
+        $this->data['config_serial_restore_deleted'] = (int)$this->config->get('config_serial_restore_deleted');
+      }
+        ]]></add>
+      </operation>
+    </file>
+    
+    <file name="admin/language/english/setting/setting.php">
+      <operation>
+        <search position="after"><![CDATA[// Entry]]></search>
+        <add><![CDATA[
+  $_['entry_threshold'] = 'Low Count Threshold:<br /><span class="help">The number of serials to fall below before warning the admin</span>';
+  $_['entry_email_admin'] = 'Threshold email warning:';
+  $_['entry_restore_deleted'] = 'Restore Serial Keys:<br /><span class="help">Puts serial keys assigned to orders back into available serials list for reuse if deleted</span>';
+
+  ]]></add>
+      </operation>
+    </file>
+    
+    <file name="admin/language/english/english.php">
+      <operation>
+        <search position="before"><![CDATA[$_['tab_server']]></search>
+        <add><![CDATA[$_['tab_serial'] = 'Serial Keys';]]></add>
+      </operation>
+    </file>
+    
+    <file name="admin/view/template/setting/setting.tpl">
+      <operation>
+        <search position="replace"><![CDATA[<a href="#tab-server">]]></search>
+        <add><![CDATA[<a href="#tab-serial"><?php echo $tab_serial; ?></a><a href="#tab-server">]]></add>
+      </operation>
+      <operation>
+        <search position="before"><![CDATA[<div id="tab-server">]]></search>
+        <add><![CDATA[		<div id="tab-serial">
+        <table class="form">
+          <tr>
+            <td><?php echo $entry_threshold; ?></td>
+            <td><input type="text" name="config_serial_threshold" size="3" value="<?php echo $config_serial_threshold; ?>" /></td>
+          </tr>
+          <tr>
+            <td><?php echo $entry_email_admin; ?></td>
+            <td>
+                      <input type="radio" name="config_serial_email_admin" value="1"<?php if(!empty($config_serial_email_admin)) echo ' checked="checked"'; ?> /> <?php echo $text_yes; ?>
+                      <input type="radio" name="config_serial_email_admin" value=0"<?php if(empty($config_serial_email_admin)) echo ' checked="checked"'; ?> /> <?php echo $text_no; ?>
+                    </td>
+          </tr>
+          <tr>
+            <td><?php echo $entry_restore_deleted; ?></td>
+            <td>
+                      <input type="radio" name="config_serial_restore_deleted" value="1"<?php if(!empty($config_serial_restore_deleted)) echo ' checked="checked"'; ?> /> <?php echo $text_yes; ?>
+                      <input type="radio" name="config_serial_restore_deleted" value=0"<?php if(empty($config_serial_restore_deleted)) echo ' checked="checked"'; ?> /> <?php echo $text_no; ?>
+                    </td>
+          </tr>
+        </table>
+        
+        </div>]]></add>
+      </operation>
+    </file>
+    
+    <file name="">
+      <operation>
+        <search position="after"><![CDATA[]]></search>
+        <add><![CDATA[]]></add>
+      </operation>
+    </file>
+    
+    <!-- END ADMIN SETTINGS TAB CHANGES -->
+
+
+
+    <!-- START DOWNLOADS PAGE CHANGES -->
+    <file name="catalog/controller/account/download.php">
+      <operation>
+        <search position="before"><![CDATA[$this->data['downloads'] = array();]]></search>
+        <add><![CDATA[            $this->load->model('catalog/serial');
+              $this->data['text_serial_keys'] = $this->language->get('text_serial_keys');]]></add>
+      </operation>
+      <operation>
+        <search position="before"><![CDATA[=> $result['order_id']]]></search>
+			<add><![CDATA[                        'serials'      => $this->model_catalog_serial->getOrderSerials($result['order_download_id']),
+			                                      'featurecodes' => $this->model_catalog_serial->getOrderSerials($result['order_download_id']),]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/language/english/account/download.php">
+		<operation>
+			<search position="after"><![CDATA['text_download']]></search>
+			<add><![CDATA[$_['text_serial_keys'] = 'Serial Keys:';]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/view/theme/amsTheme/template/account/download.tpl">
+		<operation>
+			<search position="before"><![CDATA[<?php echo $text_date_added; ?>]]></search>
+			<add><![CDATA[            <?php if($download['serials']){ ?>
+            <br /><b><?php echo $text_serial_keys; ?></b><br />
+                <span style="font-family: monospace"><?php echo implode('<br />', $download['serials']); ?></span><br /><br />
+            </tr>
+
+            <?php } ?>]]></add>
+		</operation>
+	</file>
+	<!-- END DOWNLOADS PAGE CHANGES -->
+
+
+
+	<!-- START INVOICE PAGE CHANGES -->
+	<file name="catalog/controller/account/order.php">
+		<operation>
+			<search position="after"><![CDATA[$this->data['text_comment']]]></search>
+			<add><![CDATA[			$this->data['text_serial_keys'] = $this->language->get('text_serial_keys');
+			$this->load->model('catalog/serial');]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[foreach ($products as $product) {]]></search>
+			<add><![CDATA[
+                          			$serials = array();
+                                $featurecodes = array();
+      			if($order_info['order_status_id'] == $this->config->get('config_complete_status_id')) {
+      				$serials      = $this->model_catalog_serial->getSerialsByProduct($product['order_product_id']);
+      		}]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[=> $product['model'],]]></search>
+			<add><![CDATA[          			'serials'  => $serials,
+                                    'featurecodes' => $this->model_catalog_serial->getFeatureCodesByProduct($product['order_product_id']),]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/language/english/account/order.php">
+		<operation>
+			<search position="after"><![CDATA['text_error']]></search>
+			<add><![CDATA[$_['text_serial_keys']      = 'Serial keys for this product:';]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/view/theme/amsTheme/template/account/order_info.tpl">
+		<operation>
+			<search position="after" offset="1"><![CDATA[echo $product['total']]]></search>
+			<add><![CDATA[<?php if($product['serials']) : ?>
+		<tr>
+			<td colspan="1" style="text-align: right"><strong><?php echo $text_serial_keys; ?></strong></td>
+			<td colspan="4" style="font-family: monospace;">
+
+
+<?php foreach($product['serials'] as $k => $serial): ?>
+
+     <?php $generate_keycode_from = $serial . $product['featurecodes'][$k] ?>
+     <?php $keyCode = $this->model_catalog_serial->generate_keycode($generate_keycode_from); ?>
+     <nobr><b>Serial : </b><?php echo $serial; ?><?php echo $product['featurecodes'][$k]; ?> | <b>KeyCode : </b> <?php echo $keyCode; ?></nobr><br />
+
+
+<?php endforeach; ?>
+
+      </td>
+		</tr>
+<?php endif; ?>]]></add>
+		</operation>
+	</file>
+	<!-- END INVOICE PAGE CHANGES -->
+
+
+
+	<!-- START ORDER HOOK AND EMAIL TEMPLATE CHANGE -->
+	<file name="catalog/model/checkout/order.php">
+		<operation>
+			<search position="before"><![CDATA[product SET quantity =]]></search>
+			<add><![CDATA[            $this->load->model('catalog/serial');
+			if(!empty($order_product)) $product = $order_product;
+            $this->model_catalog_serial->addOrderSerials((int)$product['product_id'], (int)$product['order_id'], (int)$product['order_product_id'], (int)$product['quantity']);
+			]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$template->data['products'] = array();]]></search>
+			<add><![CDATA[            $this->load->model('catalog/serial');
+			$template->data['text_serial_keys'] = $language->get('text_serial_keys');]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[$option_data = array();]]></search>
+			<add><![CDATA[      			$serials = array();
+      			if($order_status_id == $this->config->get('config_complete_status_id')) {
+              $sns          = $this->model_catalog_serial->getSerialsByProduct($product['order_product_id']);
+              $featurecodes = $this->model_catalog_serial->getFeaturecodesByProduct($product['order_product_id']);
+              if(!empty($sns)) {
+                foreach ($sns as $sn) {
+                  $serials[] = "Serial Number: " . $sn . $featurecodes[0] . " | Keycode: " . $this->model_catalog_serial->generate_keycode($sn . $featurecodes[0]);
+                }
+              }
+      			}]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[=> $option_data,]]></search>
+			<add><![CDATA[                    'serials'  => $serials,]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/language/english/mail/order.php">
+		<operation>
+			<search position="after"><![CDATA['text_new_download']]></search>
+			<add><![CDATA[$_['text_serial_keys']      = 'Serial numbers and key codes for this product:';]]></add>
+		</operation>
+	</file>
+
+
+<!--
+	<file name="catalog/view/theme/amsTheme/template/mail/order.tpl">
+		<operation>
+			<search position="after" offset="1"><![CDATA[<?php echo $product['total']; ?>]]></search>
+			<add><![CDATA[<?php if($product['serials']) : ?>
+		<tr style="background-color: #eeeeee">
+			<td colspan="2" style="text-align: right"><strong><?php echo $text_serial_keys; ?></strong></td>
+			<td colspan="3" style="font-family: monospace;"><?php echo implode('<br />', $product['serials']); ?> </td>
+		</tr>
+<?php endif; ?>]]></add>
+		</operation>
+	</file>
+-->
+
+
+
+	<!-- END ORDER HOOK AND EMAIL TEMPLATE CHANGE -->
+
+	<!-- TEMPLATE
+	<file name="">
+		<operation>
+			<search position="after"><![CDATA[]]></search>
+			<add><![CDATA[]]></add>
+		</operation>
+	</file>
+	-->
+
+	<!-- END FILES -->
+</modification>

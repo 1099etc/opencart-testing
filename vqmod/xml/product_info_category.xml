@@ -1,0 +1,27 @@
+<modification>
+	<id>AMS Customizations</id>
+	<version>1.5.x</version>
+	<vqmver>2.X</vqmver>
+	<author>Advanced Micro Solutions - John LeVan</author>
+
+  <file name="catalog/model/catalog/product.php">
+
+    <operation>
+      <search position="replace" offset="1"><![CDATA[(SELECT COUNT(*) AS total FROM " . DB_PREFIX . "review r2 WHERE r2.product_id = p.product_id AND r2.status = '1' GROUP BY r2.product_id) AS reviews, p.sort_order]]></search>
+      <add><![CDATA[(SELECT COUNT(*) AS total FROM " . DB_PREFIX . "review r2 WHERE r2.product_id = p.product_id AND r2.status = '1' GROUP BY r2.product_id) AS reviews, p.sort_order,(SELECT category_id FROM " . DB_PREFIX . "product_to_category pc WHERE pc.product_id = p.product_id) AS category_id]]></add>
+    </operation>
+
+
+
+    <operation>
+      <search position="after" offset="0"><![CDATA['product_id'       => $query->row['product_id'],]]></search>
+      <add><![CDATA['category_id'      => $query->row['category_id'],]]></add>
+    </operation>
+
+
+  </file>
+
+
+
+
+</modification>

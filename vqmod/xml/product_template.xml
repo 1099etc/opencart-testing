@@ -1,0 +1,38 @@
+<modification>
+	<id>AMS Customizations</id>
+	<version>1.5.x</version>
+	<vqmver>2.X</vqmver>
+	<author>Advanced Micro Solutions - John LeVan</author>
+
+  <file name="catalog/controller/product/product.php">
+
+    <operation>
+      <search position="before"><![CDATA[if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/product/product.tpl')) {]]></search>
+      <add><![CDATA[
+      if((isset($category_id) && $category_id == 63) || (isset($product_info['category_id']) && $product_info['category_id'] == 63)) {
+        if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/product/product2.tpl')) {
+          $this->template = $this->config->get('config_template') . '/template/product/product2.tpl';
+        } else {
+          $this->template = 'default/template/product/product2.tpl';
+        }
+      }
+      else { 
+        if((isset($category_id) && $category_id != 63) || !isset($category_id)) {
+
+      ]]></add>
+    </operation>
+
+
+
+    <operation>
+      <search position="after" offset="2"><![CDATA[$this->template = 'default/template/product/product.tpl';]]></search>
+      <add><![CDATA[}}]]></add>
+    </operation>
+
+
+  </file>
+
+
+
+
+</modification>

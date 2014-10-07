@@ -1,0 +1,156 @@
+<modification>
+	<id>AMS Customizations</id>
+	<version>1.5.x</version>
+	<vqmver>2.X</vqmver>
+	<author>Advanced Micro Solutions - John LeVan</author>
+
+    
+  <!-- Modification of the Order List to turn Customer Name into a link to the customer account. -->
+  <file name="admin/model/sale/order.php">
+    <!-- Also had to modify jg_serial_15X.xml to include 'o.customer_id' in the query. Fixing the query here was causing issues. -->
+
+    <operation>
+      <search position="after"><![CDATA[$sort_data = array(]]></search>
+      <add><![CDATA['o.customer_id',]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA[public function getOrders($data = array()) {]]></search>
+      <add><![CDATA[
+
+      public function getOrderProcessingStatuses() {
+        $query = $this->db->query("select * from order_processing_status");
+        return $query->rows;
+      }
+      
+      public function getOrderProcessingStatus($order_id) {
+        $query = $this->db->query("select order_processing_status_id from `order` where order_id='" . $order_id . "'");
+        return $query->rows;
+      }
+      
+      public function setOrderProcessingStatus($order_id, $statusID) {
+        $query = $this->db->query("update `order` set order_processing_status_id = '" . $statusID . "' where order_id='" . $order_id . "'");
+      }
+
+      ]]></add>
+    </operation>
+
+  </file>
+
+
+
+
+
+
+
+
+
+  <file name="admin/controller/sale/order.php">
+    <operation>
+      <search position="after"><![CDATA[$this->data['orders'][] = array(]]></search>
+      <add><![CDATA[        'customer_id'      => isset($order_info['customer_id']) ? $order_info['customer_id'] : $result['customer_id'],
+
+    ]]></add>
+    </operation>
+    <operation>
+      <search position="after"><![CDATA[$products = $this->model_sale_order->getOrderProducts($order_id);]]></search>
+      <add><![CDATA[$this->load->model('catalog/serial');]]></add>
+    </operation>
+    <operation>
+      <search position="after"><![CDATA['total'    => $this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value'])]]></search>
+      <add><![CDATA[
+, 'serial'   => is_array($this->model_catalog_serial->getSerialsByProduct($product['order_product_id'])) ? array_values($this->model_catalog_serial->getSerialsByProduct($product['order_product_id'])) : '',
+            'featurecode' => is_array($this->model_catalog_serial->getFeatureCodesByProduct($product['order_product_id'])) ? array_values($this->model_catalog_serial->getFeatureCodesByProduct($product['order_product_id'])) : '',
+]]></add>
+    </operation>
+
+    
+
+
+
+  </file>
+
+
+  <file name="admin/view/template/sale/order_list.tpl">
+    <operation>
+      <search position="replace"><![CDATA[<td class="left processing_id<?php echo $order['order_processing_status_id']; ?>"><?php echo $order['customer']; ?></td>]]></search>
+    <add><![CDATA[              <td class="left processing_id<?php echo $order['order_processing_status_id']; ?>"><a href="index.php?route=sale/customer/update&token=<?php echo $token; ?>&customer_id=<?php echo $order['customer_id']; ?>"><?php echo $order['customer']; ?></a></td>]]></add>
+    </operation>
+
+    <operation>
+      <search position="replace"><![CDATA[<div class="buttons"><a onclick="$('#form').attr('action', '<?php echo $invoice; ?>'); $('#form').attr('target', '_blank'); $('#form').submit();" class="button"><?php echo $button_invoice; ?></a>]]></search>
+      <add><![CDATA[
+<div class="buttons">
+
+<!--
+<select name='processing_status_id' id='processing_status_id' style='width: 25px;'>
+<option value="" style='background-color: white; color: black;'>Color Marker</option>
+
+<?php foreach($order_processing_statuses as $order_processing_status_id) { ?>
+  <option value="<?php echo $order_processing_status_id['order_processing_status_id']; ?>" style='background-color:<?php echo $order_processing_status_id['colorCode']; ?>;'><?php echo $order_processing_status_id['title']; ?></option>
+<?php } ?>
+</select>
+-->
+
+<script>
+$(document).ready(function () {
+    $('#processing_status_id').change(function () {
+        var option = $('option:selected', this).css('background-color');
+        $('#processing_status_id').css("background-color", option);
+    });
+});
+</script>
+
+[ <input type='checkbox' value='1' name='hideSerial' id='hideSerial' style='vertical-align: middle' /> Hide Serial]
+[ <input type='checkbox' value='1' name='supressNelco' id='supressNelco' style='vertical-align: middle' /> Supress Nelco]
+[ <input type='checkbox' value='1' name='notifyUser' id='notifyUser' style='vertical-align: middle' /> Notify User ]
+
+
+<a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=true&shippinglabels=ship'); $('#form').attr('target', '_blank');
+$('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
+$('#form').submit();" class="button">Print Shipping - X2</a>
+
+
+<a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=false&cut_order=seq&shippinglabels=ship'); $('#form').attr('target', '_blank'); 
+$('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
+$('#form').submit();" class="button">Print Shipping</a>
+
+<a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=false&cut_order=seq&shippinglabels=invoice'); $('#form').attr('target', '_blank'); 
+$('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
+$('#form').submit();" class="button">Print Invoice - Sequential</a>
+
+<a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=true&shippinglabels=invoice'); $('#form').attr('target', '_blank');
+$('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
+$('#form').submit();" class="button">Print Invoice - X2</a>
+
+<a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=false&shippinglabels=invoice'); $('#form').attr('target', '_blank');
+$('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
+$('#form').submit();" class="button">Print Invoice</a>
+
+]]></add>
+    </operation>
+  </file>
+
+
+
+
+<file name="admin/controller/sale/order.php">
+  <operation>
+    <search position="replace"><![CDATA['country'   => $order_info['shipping_country']]]></search>
+    <add><![CDATA['country'   => '']]></add>
+  </operation>
+</file>
+
+
+
+</modification>

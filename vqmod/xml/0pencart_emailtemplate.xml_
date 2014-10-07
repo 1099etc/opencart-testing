@@ -1,0 +1,706 @@
+<modification>
+	<id>Professiona HTML Email Template</id>
+	<version>0.14</version>
+	<vqmver>2.4.0</vqmver>
+	<author>opencart-templates.co.uk</author>
+	
+	<file name='system/startup.php'>
+        <operation>
+            <search position='before'><![CDATA[ ?> ]]></search>
+            <add trim='true'><![CDATA[
+            require_once(DIR_SYSTEM . 'library/emailtemplate/email_template.php');
+           	]]></add>
+        </operation>
+	</file>
+	
+	<!-- <file name="system/database/mysql.php">
+		<operation error="skip" info="Add debug backtrace extra debug info">
+			<search position="replace"><![CDATA[ 
+				trigger_error('Error: ' . mysql_error($this->link) . '<br />Error No: ' . mysql_errno($this->link) . '<br />' . $sql); ]]></search>
+			<add><![CDATA[ 
+	        	$error = 'Error: ' . mysql_error($this->link) . '<br />Error No: ' . mysql_errno($this->link) . '<br />' . $sql;
+	        	$callers = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+				if($callers){
+					foreach($callers as $key => $caller){						
+						if(isset($caller['class']) && $caller['class'] == 'DB'){
+							$next = $callers[$key+1];
+							$error .= '<br /><br />File: ' . $caller['file'] . '(' . $caller['line'] . ')' .((isset($next['class']) && $next['class']) ? ('<br />Class: '.$next['class']) : '').((isset($next['function']) && $next['function']) ? ('<br />Function: '.$next['function']) : '');
+							break;
+						}					
+					}
+				}
+				trigger_error($error);]]></add>
+	       </operation>
+	</file> -->
+
+	<file name="system/library/language.php">
+        <operation info="Add ability to load catalog language from admin">
+            <search position="replace"><![CDATA[
+            DIR_LANGUAGE . $this->directory ]]></search>
+            <add trim="true"><![CDATA[
+            $this->path . $this->directory ]]></add>
+        </operation>
+        <operation error="skip" info="Missing from OC:1.5.1">
+            <search position="replace"><![CDATA[
+            DIR_LANGUAGE . $this->default ]]></search>
+            <add trim="true"><![CDATA[
+            $this->path . $this->default ]]></add>
+        </operation>
+        <operation>
+            <search position="after"><![CDATA[
+            private $directory; ]]></search>
+            <ignoreif><![CDATA[ 
+            private $path = DIR_LANGUAGE; ]]></ignoreif>
+            <add><![CDATA[	private $path = DIR_LANGUAGE; ]]></add>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[
+            public function get($key ]]></search>
+            <ignoreif><![CDATA[ 
+            public function setPath($path) ]]></ignoreif>
+            <add><![CDATA[   /**
+	* Set language directory path
+	* - ability to load catalog language from admin
+	*/
+	public function setPath($path) 
+	{
+		if(!is_dir($path)){
+			trigger_error('Error: check path exists: '.$path);
+			exit;
+		}
+		$this->path = $path;
+	} 
+	]]></add>
+        </operation>
+        <operation info="Language file with underscore">
+            <search position="replace" index="1"><![CDATA[
+            public function load($filename) ]]></search>
+            <add><![CDATA[	
+	/**
+	 * Load Language File
+	 *
+	 * @param string $filename
+	 * @param bool $defaultOnly - load underscore language file.
+     */
+     public function load($filename, $loadOverwrite = true)]]></add>
+        </operation>
+        <operation info="Language file with underscore">
+            <search position="after" index="1"><![CDATA[
+            $this->data = array_merge($this->data, $_); ]]></search>
+            <ignoreif><![CDATA[ 
+            $file = $this->path . $this->directory . '/' . $filename . '_.php'; ]]></ignoreif>
+            <add><![CDATA[	
+            # Overwrite language file with underscore
+            if($loadOverwrite){
+				$file = $this->path . $this->directory . '/' . $filename . '_.php';
+				    	
+				if (file_exists($file)) {
+					$_ = array();
+		  		
+					require($file);
+			
+					$this->data = array_merge($this->data, $_);
+				}
+			}]]></add>
+        </operation>
+	</file>
+
+	<file name="system/library/mail.php">		
+		<operation>
+			<search position="before"><![CDATA[
+				protected $subject;]]></search>
+			<ignoreif><![CDATA[ 
+            protected $replyTo; ]]></ignoreif>
+			<add><![CDATA[	protected $replyTo;
+	protected $replyToName;
+	protected $cc;
+	protected $bcc; ]]></add>
+		</operation>
+		
+		<operation>
+			<search position="before"><![CDATA[
+				public function send( ]]></search>
+			<ignoreif><![CDATA[ 
+            public function setReplyTo( ]]></ignoreif>
+			<add><![CDATA[	public function setReplyTo($address, $name = '') {
+		$this->replyTo = $address;
+		$this->replyToName = ($name != '') ? $name : $address;
+	}
+	
+	public function setCc($address) {
+		$this->cc = $address;
+	}
+	
+	public function setBcc($address) {
+		$this->bcc = $address;
+	}
+	]]></add>
+		</operation>
+        <operation>
+            <search position="after"><![CDATA[
+            $header .= 'Reply-To: ]]></search>
+            <ignoreif><![CDATA[ 
+            if($this->replyTo){ ]]></ignoreif>
+            <add><![CDATA[
+            }
+            
+            if($this->cc){
+            	$header .= 'cc: ' . $this->cc . $this->newline;
+            } 
+            
+            if($this->bcc){
+            	$header .= 'bcc: ' . $this->bcc . $this->newline;
+            }]]></add>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[
+            $header .= 'Reply-To: ]]></search>
+            <ignoreif><![CDATA[ 
+            if($this->replyTo){ ]]></ignoreif>
+            <add><![CDATA[
+            if($this->replyTo){
+            	$header .= 'Reply-To: ' . '=?UTF-8?B?' . base64_encode($this->replyToName) . '?=' . '<' . $this->replyTo . '>' . $this->newline;
+            } else { ]]></add>
+        </operation>
+	</file>
+	
+	<file name="catalog/model/account/address.php">
+        <operation>
+            <search position="before"><![CDATA[
+            public function getAddress($address_id) { ]]></search>
+            <ignoreif><![CDATA[ 
+            public function getAddressNotLoggedIn( ]]></ignoreif>
+            <add><![CDATA[
+	/*
+	 * If the customer is not logged in and we need a way to get the address.
+	 */
+	public function getAddressNotLoggedIn($address_id, $customer_id)
+	{
+		$address_query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "address WHERE address_id = '" . (int)$address_id . "' AND customer_id = '" . (int)$customer_id . "'");
+
+		if ($address_query->num_rows) {
+			$country_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE country_id = '" . (int)$address_query->row['country_id'] . "'");
+			if ($country_query->num_rows) {
+				$country = $country_query->row['name'];
+				$iso_code_2 = $country_query->row['iso_code_2'];
+				$iso_code_3 = $country_query->row['iso_code_3'];
+				$address_format = $country_query->row['address_format'];
+			} else {
+				$country = '';
+				$iso_code_2 = '';
+				$iso_code_3 = '';
+				$address_format = '';
+			}
+
+			$zone_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "zone` WHERE zone_id = '" . (int)$address_query->row['zone_id'] . "'");
+
+			if ($zone_query->num_rows) {
+				$zone = $zone_query->row['name'];
+				$code = $zone_query->row['code'];
+			} else {
+				$zone = '';
+				$code = '';
+			}
+
+			$address_data = array(
+				'firstname'      => $address_query->row['firstname'],
+				'lastname'       => $address_query->row['lastname'],
+				'company'        => $address_query->row['company'],
+				'address_1'      => $address_query->row['address_1'],
+				'address_2'      => $address_query->row['address_2'],
+				'postcode'       => $address_query->row['postcode'],
+				'city'           => $address_query->row['city'],
+				'zone_id'        => $address_query->row['zone_id'],
+				'zone'           => $zone,
+				'zone_code'      => $code,
+				'country_id'     => $address_query->row['country_id'],
+				'country'        => $country,
+				'iso_code_2'     => $iso_code_2,
+				'iso_code_3'     => $iso_code_3,
+				'address_format' => $address_format
+			);
+
+			return $address_data;
+		} else {
+			return false;
+		}
+	} 
+			]]></add>
+        </operation>
+	</file>
+
+	<file name="catalog/model/tool/image.php">
+        <operation>
+            <search position="after"><![CDATA[
+            class ModelToolImage extends Model { ]]></search>
+            <ignoreif><![CDATA[ 
+            public function get( ]]></ignoreif>
+            <add><![CDATA[
+	/*
+	 * Image Absolute URL, no resize
+	 */
+	public function get($filename) 
+	{
+		if (!file_exists(DIR_IMAGE . $filename) || !is_file(DIR_IMAGE . $filename)) {
+			return;
+		}
+	
+		if (isset($this->request->server['HTTPS']) && (($this->request->server['HTTPS'] == 'on') || ($this->request->server['HTTPS'] == '1'))) {
+			if($this->config->get('config_ssl')){
+				$url = $this->config->get('config_ssl') . 'image/';
+			} else {
+				$url = defined("HTTPS_IMAGE") ? HTTPS_IMAGE : HTTP_CATALOG . 'image/';
+			}
+		} else {
+			if($this->config->get('config_url')){
+				$url = $this->config->get('config_url') . 'image/';
+			} else {
+				$url = defined("HTTP_IMAGE") ? HTTP_IMAGE : HTTP_CATALOG . 'image/';
+			}
+		}
+	
+		return $url . $filename;
+	} 
+			]]></add>
+        </operation>
+	</file>
+	
+	<file name="admin/model/tool/image.php">
+        <operation>
+            <search position="after"><![CDATA[ 
+            class ModelToolImage extends Model ]]></search>
+            <ignoreif><![CDATA[ 
+            public function get($filename) ]]></ignoreif>
+            <add><![CDATA[	/*
+	 * Image Absolute URL, no resize
+	 */
+	public function get($filename) 
+	{
+		if (!file_exists(DIR_IMAGE . $filename) || !is_file(DIR_IMAGE . $filename)) {
+			return;
+		}
+
+		if (isset($this->request->server['HTTPS']) && (($this->request->server['HTTPS'] == 'on') || ($this->request->server['HTTPS'] == '1'))) {
+			if($this->config->get('config_ssl')){
+				$url = $this->config->get('config_ssl') . 'image/';
+			} else {
+				$url = defined("HTTPS_IMAGE") ? HTTPS_IMAGE : HTTP_CATALOG . 'image/';
+			}
+		} else {
+			if($this->config->get('config_url')){
+				$url = $this->config->get('config_url') . 'image/';
+			} else {
+				$url = defined("HTTP_IMAGE") ? HTTP_IMAGE : HTTP_CATALOG . 'image/';
+			}
+		}
+
+		return $url . $filename;
+	} 
+			]]></add>
+        </operation>
+	</file>
+
+	<file name="catalog/controller/account/order.php">
+		<operation>
+			<search position="replace"><![CDATA[
+			nl2br($result['comment'])
+			]]></search>
+			<add trim="true"><![CDATA[
+			(strcmp($result['comment'], strip_tags($html_str = html_entity_decode($result['comment'], ENT_QUOTES, 'UTF-8'))) == 0) ? nl2br($result['comment']) : $html_str
+			]]></add>
+		</operation>
+	</file>
+	
+	<file name="catalog/model/account/customer_group.php" error="skip">
+        <operation error="skip" info="added OC:1.5.5">
+            <search position="replace"><![CDATA[
+            SELECT DISTINCT * FROM " . DB_PREFIX . "customer_group WHERE customer_group_id ]]></search>
+            <add trim="true"><![CDATA[
+			SELECT DISTINCT cg.*, cgd.* FROM " . DB_PREFIX . "customer_group cg LEFT JOIN " . DB_PREFIX . "customer_group_description cgd ON (cg.customer_group_id = cgd.customer_group_id) WHERE cg.customer_group_id ]]></add>
+        </operation>
+    </file>
+
+    <file name="catalog/controller/account/login.php">
+        <operation error="skip" info="Use GET request to pre-populate email address">
+            <search position="after"><![CDATA[
+            $this->data['email'] = $this->request->post['email']; ]]></search>
+            <ignoreif><![CDATA[ 
+            elseif(isset($this->request->get['email'])) ]]></ignoreif>
+            <add><![CDATA[		} elseif(isset($this->request->get['email'])) {
+			$this->data['email'] = $this->request->get['email']; ]]></add>
+        </operation>
+    </file>
+
+	<file name="catalog/model/account/customer.php">
+        <operation info="Add ability to find a language for registered customer">
+            <search position="replace"><![CDATA[
+            $this->db->query("INSERT INTO " . DB_PREFIX . "customer SET store_id = ]]></search>
+            <add trim="true"><![CDATA[
+            $this->db->query("INSERT INTO " . DB_PREFIX . "customer SET language_id = '".intval($this->config->get('config_language_id'))."', store_id = ]]></add>
+        </operation>
+	</file>
+	
+	<file name="admin/controller/sale/contact.php">
+        <operation error="skip" info="Bug fix 1.5.2.1">
+            <search position="replace"><![CDATA[
+            'filter_customer_group_id' => $this->request->post['filter_customer_group_id'], ]]></search>
+            <add trim="true"><![CDATA[
+            'filter_customer_group_id' => $this->request->post['customer_group_id'], ]]></add>
+        </operation>
+	</file>
+	
+	<file name="admin/model/setting/setting.php">
+        <operation error="skip" info="Bug fix 1.5.1.3.1">
+            <search position="replace"><![CDATA[ 
+            $data[$result['key']] = unserialize($setting['value']); ]]></search>
+            <add trim="true"><![CDATA[ 
+            $data[$result['key']] = unserialize($result['value']); ]]></add>
+        </operation>
+	</file>
+			
+	<file name="admin/model/localisation/language.php">
+        <operation info="Add method to get language by code">
+            <search position="before"><![CDATA[ 
+            public function getLanguages( ]]></search>
+            <ignoreif><![CDATA[ 
+            public function getLanguageByCode( ]]></ignoreif>
+            <add><![CDATA[
+            /*
+             * Get Language by code
+             */
+            public function getLanguageByCode($code) 
+            {
+				$query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "language WHERE code = '" . $this->db->escape($code) . "' LIMIT 1");
+			
+				return $query->row;
+			} ]]></add>
+        </operation>
+	</file>
+					
+	<file name="admin/model/sale/order.php">
+        <operation info="method:getEmailsByProductsOrdered add extra useful info, added OC:1.5.2.1" error="skip">
+            <search position="replace"><![CDATA[
+            "SELECT DISTINCT email FROM `" . DB_PREFIX . "order` o ]]></search>
+            <add trim="true"><![CDATA[
+            "SELECT DISTINCT email, o.order_id, o.customer_id, o.store_id, o.language_id FROM `" . DB_PREFIX . "order` o ]]></add>
+        </operation>
+	</file>	
+	<file name="admin/model/sale/customer.php">
+        <operation info="method:getCustomersByProduct add order_id, less than OC:1.5.3.1" error="skip">
+            <search position="replace"><![CDATA[
+            "SELECT DISTINCT email FROM `" . DB_PREFIX . "order` o ]]></search>
+            <add trim="true"><![CDATA[
+            "SELECT DISTINCT email, o.order_id, o.customer_id, o.store_id, o.language_id FROM `" . DB_PREFIX . "order` o ]]></add>
+        </operation>
+	</file>
+		
+	<file name="admin/controller/setting/store.php">
+        <operation>
+            <search position="before"><![CDATA[ $this->data['entry_secure'] = $this->language->get('entry_secure'); ]]></search>
+            <ignoreif><![CDATA[ $this->data['text_mail'] ]]></ignoreif>
+            <add><![CDATA[		$this->data['text_mail'] = $this->language->get('text_mail');
+		$this->data['text_smtp'] = $this->language->get('text_smtp');		
+		$this->data['entry_mail_protocol'] = $this->language->get('entry_mail_protocol');
+		$this->data['entry_mail_parameter'] = $this->language->get('entry_mail_parameter');
+		$this->data['entry_smtp_host'] = $this->language->get('entry_smtp_host');
+		$this->data['entry_smtp_username'] = $this->language->get('entry_smtp_username');
+		$this->data['entry_smtp_password'] = $this->language->get('entry_smtp_password');
+		$this->data['entry_smtp_port'] = $this->language->get('entry_smtp_port');
+		$this->data['entry_smtp_timeout'] = $this->language->get('entry_smtp_timeout');
+		$this->data['entry_alert_mail'] = $this->language->get('entry_alert_mail');
+		$this->data['entry_account_mail'] = $this->language->get('entry_account_mail');
+		$this->data['entry_alert_emails'] = $this->language->get('entry_alert_emails');			
+		$this->data['tab_mail'] = $this->language->get('tab_mail');]]></add>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[ if (isset($this->request->post['config_secure'])) ]]></search>
+            <ignoreif><![CDATA[ $this->data['config_mail_protocol'] ]]></ignoreif>
+            <add><![CDATA[		if (isset($this->request->post['config_mail_protocol'])) {
+			$this->data['config_mail_protocol'] = $this->request->post['config_mail_protocol'];
+		} elseif (isset($store_info['config_email'])) {
+			$this->data['config_mail_protocol'] = $store_info['config_email'];
+		}
+		
+		if (isset($this->request->post['config_mail_parameter'])) {
+			$this->data['config_mail_parameter'] = $this->request->post['config_mail_parameter'];
+		} elseif (isset($store_info['config_mail_parameter'])) {
+			$this->data['config_mail_parameter'] = $store_info['config_mail_parameter'];
+		}
+				
+		if (isset($this->request->post['config_smtp_host'])) {
+			$this->data['config_smtp_host'] = $this->request->post['config_smtp_host'];
+		} elseif (isset($store_info['config_smtp_host'])) {
+			$this->data['config_smtp_host'] = $store_info['config_smtp_host'];
+		}		
+
+		if (isset($this->request->post['config_smtp_username'])) {
+			$this->data['config_smtp_username'] = $this->request->post['config_smtp_username'];
+		} elseif (isset($store_info['config_smtp_username'])) {
+			$this->data['config_smtp_username'] = $store_info['config_smtp_username'];
+		}	
+		
+		if (isset($this->request->post['config_smtp_password'])) {
+			$this->data['config_smtp_password'] = $this->request->post['config_smtp_password'];
+		} elseif (isset($store_info['config_smtp_password'])) {
+			$this->data['config_smtp_password'] = $store_info['config_smtp_password'];
+		}	
+		
+		if (isset($this->request->post['config_smtp_port'])) {
+			$this->data['config_smtp_port'] = $this->request->post['config_smtp_port'];
+		} elseif (isset($store_info['config_smtp_port'])) {
+			$this->data['config_smtp_port'] = $store_info['config_smtp_port'];
+		} else {
+			$this->data['config_smtp_port'] = 25;
+		}	
+		
+		if (isset($this->request->post['config_smtp_timeout'])) {
+			$this->data['config_smtp_timeout'] = $this->request->post['config_smtp_timeout'];
+		} elseif (isset($store_info['config_smtp_timeout'])) {
+			$this->data['config_smtp_timeout'] = $store_info['config_smtp_timeout'];
+		} else {
+			$this->data['config_smtp_timeout'] = 5;	
+		}	
+		
+		if (isset($this->request->post['config_alert_mail'])) {
+			$this->data['config_alert_mail'] = $this->request->post['config_alert_mail'];
+		} elseif (isset($store_info['config_alert_mail'])) {
+			$this->data['config_alert_mail'] = $store_info['config_alert_mail'];
+		}
+
+		if (isset($this->request->post['config_account_mail'])) {
+			$this->data['config_account_mail'] = $this->request->post['config_account_mail'];
+		} elseif (isset($store_info['config_account_mail'])) {
+			$this->data['config_account_mail'] = $store_info['config_account_mail'];
+		}
+		
+		if (isset($this->request->post['config_alert_emails'])) {
+			$this->data['config_alert_emails'] = $this->request->post['config_alert_emails'];
+		} elseif (isset($store_info['config_alert_emails'])) {
+			$this->data['config_alert_emails'] = $store_info['config_alert_emails'];
+		}]]></add>
+        </operation>
+	</file>
+	
+	<file name="admin/view/template/setting/store_form.tpl">
+        <operation>
+            <search position="replace"><![CDATA[ <a href="#tab-server" ]]></search>
+            <ignoreif><![CDATA[ <a href="#tab-mail" ]]></ignoreif>
+            <add trim="true"><![CDATA[ <a href="#tab-mail"><?php echo $tab_mail; ?></a> <a href="#tab-server" ]]></add>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[ <div id="tab-server"> ]]></search>
+            <ignoreif><![CDATA[ <div id="tab-mail" ]]></ignoreif>
+            <add><![CDATA[           <div id="tab-mail">
+          <table class="form">
+            <tr>
+              <td><?php echo $entry_mail_protocol; ?></td>
+              <td><select name="config_mail_protocol">                  
+                  <option value="mail"<?php if ($config_mail_protocol == 'mail') { ?> selected="selected"<?php } ?>><?php echo $text_mail; ?></option>
+                  <option value="smtp"<?php if ($config_mail_protocol == 'smtp') { ?> selected="selected"<?php } ?>><?php echo $text_smtp; ?></option>
+                </select></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_mail_parameter; ?></td>
+              <td><input type="text" name="config_mail_parameter" value="<?php echo $config_mail_parameter; ?>" /></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_smtp_host; ?></td>
+              <td><input type="text" name="config_smtp_host" value="<?php echo $config_smtp_host; ?>" /></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_smtp_username; ?></td>
+              <td><input type="text" name="config_smtp_username" value="<?php echo $config_smtp_username; ?>" /></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_smtp_password; ?></td>
+              <td><input type="text" name="config_smtp_password" value="<?php echo $config_smtp_password; ?>" /></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_smtp_port; ?></td>
+              <td><input type="text" name="config_smtp_port" value="<?php echo $config_smtp_port; ?>" /></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_smtp_timeout; ?></td>
+              <td><input type="text" name="config_smtp_timeout" value="<?php echo $config_smtp_timeout; ?>" /></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_alert_mail; ?></td>
+              <td><label>
+                	<input type="radio" name="config_alert_mail" value="1"<?php if ($config_alert_mail) { ?> checked="checked" <?php } ?> />
+                	<?php echo $text_yes; ?>
+               	</label>
+                <label>
+	                <input type="radio" name="config_alert_mail" value="0"<?php if (!$config_alert_mail) { ?> checked="checked" <?php } ?> />
+	                <?php echo $text_no; ?>
+                </label></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_account_mail; ?></td>
+              <td><label>
+                	<input type="radio" name="config_account_mail" value="1"<?php if ($config_account_mail) { ?> checked="checked" <?php } ?> />
+                	<?php echo $text_yes; ?>
+               	</label>
+                <label>
+	                <input type="radio" name="config_account_mail" value="0"<?php if (!$config_account_mail) { ?> checked="checked" <?php } ?> />
+	                <?php echo $text_no; ?>
+                </label></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_alert_emails; ?></td>
+              <td><textarea name="config_alert_emails" cols="40" rows="5"><?php echo $config_alert_emails; ?></textarea></td>
+            </tr>
+          </table>
+        </div>]]></add>
+        </operation>
+	</file>
+	
+	<file name="catalog/controller/account/newsletter.php">
+        <operation>
+            <search position="after"><![CDATA[
+            class ControllerAccountNewsletter extends Controller { ]]></search>
+            <ignoreif><![CDATA[ function unsubscribe( ]]></ignoreif>
+            <add><![CDATA[
+			public function unsubscribe() { 		  		  		
+		  		$this->language->load('account/newsletter');		  		 
+		  		
+		  		$this->document->setTitle($this->language->get('heading_title'));
+		  		
+		  		if ($this->request->get['code']) {
+		  			$this->load->model('account/customer');		  				
+		  			$result = $this->model_account_customer->editNewsletterUnsubscribe($this->request->get['code']);					
+		  			if($result) {
+		  				$this->data['text_message'] = sprintf($this->language->get('success_unsubscribe'), $result['email']);
+		  			} else {
+		  				$this->data['text_message'] = $this->language->get('error_unsubscribe');
+		  			}		
+		  		} 
+		  		  		
+		  		$this->data['breadcrumbs'] = array();		  		
+		  		$this->data['breadcrumbs'][] = array(
+		  				'text'      => $this->language->get('text_home'),
+		  				'href'      => $this->url->link('common/home'),
+		  				'separator' => false
+		  		);		  		
+		  		$this->data['breadcrumbs'][] = array(
+		  				'text'      => $this->language->get('text_newsletter'),
+		  				'href'      => $this->url->link('account/newsletter', '', 'SSL'),
+		  				'separator' => $this->language->get('text_separator')
+		  		);
+		  		
+		  		$this->data['heading_title'] = $this->language->get('heading_unsubscribe');
+		    	$this->data['button_continue'] = $this->language->get('button_continue');
+		    	$this->data['continue'] = $this->url->link('common/home');
+		  		
+		  		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/common/success.tpl')) {
+					$this->template = $this->config->get('config_template') . '/template/common/success.tpl';
+				} else {
+					$this->template = 'default/template/common/success.tpl';
+				}
+		  		
+		  		$this->children = array(
+					'common/column_left',
+		  			'common/column_right',
+		  			'common/content_top',
+		  			'common/content_bottom',
+		  			'common/footer',
+		  			'common/header'
+		  		);
+		  		
+		  		$this->response->setOutput($this->render());
+		  	}
+            ]]></add>
+        </operation>
+	</file>
+	
+	<file name="catalog/controller/account/order.php">
+        <operation>
+            <search position="after"><![CDATA[
+            $this->data['continue'] = $this->url->link('account/order', '', 'SSL'); ]]></search>
+            <add><![CDATA[
+            $this->data['button_invoice'] = $this->language->get('button_invoice');
+            
+            $this->load->model('module/emailtemplate');
+            
+            # Extension settings - load main template
+			$config = $this->model_module_emailtemplate->getConfig(array(
+				'store_id' 	  => $order_info['store_id'],
+				'language_id' => $order_info['language_id']
+			), true, true);
+			
+			if ($order_info['invoice_no'] && $config['invoice_download']) {
+				$this->data['download_invoice'] = $this->url->link('account/order/invoice', 'order_id='.$order_id, 'SSL');
+			} ]]></add>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[
+            public function info() {  ]]></search>
+            <add><![CDATA[
+            public function invoice() { 
+            	if(!isset($this->request->get['order_id'])) return false;
+		
+				$this->load->model('module/emailtemplate/invoice');
+				
+				$this->model_module_emailtemplate_invoice->getInvoice($this->request->get['order_id'], true);
+            } ]]></add>
+        </operation>
+	</file>
+	<file name="catalog/view/theme/*/template/account/order_info.tpl">
+        <operation>
+            <search position="after"><![CDATA[
+            <div class="buttons"> ]]></search>
+            <add><![CDATA[
+			<?php if(isset($download_invoice)){ ?><div class="left"><a href="<?php echo $download_invoice; ?>" target="_blank" class="button"><?php echo $button_invoice; ?></a></div><?php } ?> ]]></add>
+        </operation>
+	</file>
+	
+	<file name="admin/controller/sale/order.php">
+        <operation>
+            <search position="after"><![CDATA[
+            $this->data['tab_order'] = $this->language->get('tab_order'); ]]></search>
+            <add trim="true"><![CDATA[
+			$this->data['url_resend'] = $this->url->link('sale/order/resend', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], 'SSL');
+			$this->data['button_resend'] = $this->language->get('button_resend'); ]]></add>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[
+            public function invoice() { ]]></search>
+            <add trim="true"><![CDATA[
+			public function resend() {
+				$this->load->model('sale/order');				
+				$this->load->model('module/emailtemplate');				
+				
+				$order_info = $this->model_sale_order->getOrder($this->request->get['order_id']);
+				$template = $this->model_module_emailtemplate->getCompleteOrderEmail($this->request->get['order_id']);
+				
+				$mail = new Mail();
+				$mail->protocol = $this->config->get('config_mail_protocol');
+				$mail->parameter = $this->config->get('config_mail_parameter');
+				$mail->hostname = $this->config->get('config_smtp_host');
+				$mail->username = $this->config->get('config_smtp_username');
+				$mail->password = $this->config->get('config_smtp_password');
+				$mail->port = $this->config->get('config_smtp_port');
+				$mail->timeout = $this->config->get('config_smtp_timeout');
+				$mail->setFrom($this->config->get('config_email'));
+				$mail->setSender($this->config->get('config_name'));
+				$mail->setSubject($this->config->get('config_name'));
+				$mail = $template->hook($mail);			
+				$mail->setText($template->getPlainText());	
+				$mail->setTo($order_info['email']);				
+				$mail->send();	
+				
+				$this->session->data['success'] = $this->language->get('text_success');
+				
+				$this->redirect($this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $this->request->get['order_id'], 'SSL'));		
+			} ]]></add>
+        </operation>
+	</file>
+	<file name="admin/view/template/sale/order_info.tpl">
+        <operation>
+            <search position="replace"><![CDATA[
+            <a href="<?php echo $invoice; ?>" ]]></search>
+            <add trim="true"><![CDATA[
+			<a href="<?php echo $url_resend; ?>" class="button"><?php echo $button_resend; ?></a>
+			<a href="<?php echo $invoice; ?>" ]]></add>
+        </operation>
+	</file>
+</modification>

@@ -1,0 +1,55 @@
+<modification>
+	<id>AMS Payroll States</id>
+	<version>1.5.x</version>
+	<vqmver>2.X</vqmver>
+	<author>Advanced Micro Solutions - John LeVan</author>
+
+  <file name="admin/view/template/sale/customer_form.tpl">
+    <operation>
+      <search position="after"><![CDATA[<div id="vtabs" class="vtabs"><a href="#tab-customer"><?php echo $tab_general; ?></a>]]></search>
+      <add><![CDATA[
+        <a href="#tab_customer_payroll_states">Payroll States</a>
+      ]]></add>
+    </operation>
+    <operation>
+      <search position="before" offset="2"><![CDATA[<div id="tab-history">]]></search>
+      <add><![CDATA[
+        <div id="tab_customer_payroll_states" class="vtabs-content">
+
+<div>
+  <select title='Payroll States' multiple='multiple' id='payrollMultiStates' name='payroll_states[]'>
+    <?php
+      $states = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone WHERE country_id=223");
+      $payroll_states = explode(",",$payroll_states);
+      foreach ($states->rows as $stateResult) {
+        if(in_array($stateResult['code'], $payroll_states)) {
+          echo "<option value='" . $stateResult['code'] . "' id='" . $stateResult['code'] . "' selected=selected>" . $stateResult['name'] . "</option>";
+        }
+        else {
+          echo "<option value='" . $stateResult['code'] . "' id='" . $stateResult['code'] . "'>" . $stateResult['name'] . "</option>";
+        }
+      }
+     ?>
+  </select>
+</div>
+
+
+<script><!--
+$(function() {
+  $("#payrollMultiStates").multiselect({
+    autoOpen: false,
+    height: 250
+  });
+});
+
+--></script>
+
+
+        </div>
+      ]]></add>
+    </operation>
+  </file>
+
+
+
+</modification>

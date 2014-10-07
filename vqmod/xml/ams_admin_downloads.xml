@@ -1,0 +1,99 @@
+<modification>
+w
+	<id>AMS Customizations - Downloads</id>
+	<version>1.5.x</version>
+	<vqmver>2.X</vqmver>
+	<author>Advanced Micro Solutions - John LeVan</author>
+
+    
+  <file name="admin/model/catalog/download.php">
+
+    <operation>
+      <search position="replace"><![CDATA[$this->db->query("INSERT INTO " . DB_PREFIX . "download SET filename = '" . $this->db->escape($data['filename']) . "', mask = '" . $this->db->escape($data['mask']) . "', remaining = '" . (int)$data['remaining'] . "', date_added = NOW()");]]></search>
+      <add><![CDATA[ $this->db->query("INSERT INTO " . DB_PREFIX . "download SET filename = '" . $this->db->escape($data['filename']) . "', mask = '" . $this->db->escape($data['mask']) . "', remaining = '" . (int)$data['remaining'] . "', notes = '" . $this->db->escape($data['notes']) . "', version = '" . $this->db->escape($data['version']) . "', date_added = NOW()");]]></add>
+    </operation>
+
+    <operation>
+      <search position="replace"><![CDATA[$this->db->query("UPDATE " . DB_PREFIX . "download SET filename = '" . $this->db->escape($data['filename']) . "', mask = '" . $this->db->escape($data['mask']) . "', remaining = '" . (int)$data['remaining'] . "' WHERE download_id = '" . (int)$download_id . "'");]]></search>
+      <add><![CDATA[$this->db->query("UPDATE " . DB_PREFIX . "download SET filename = '" . $this->db->escape($data['filename']) . "', mask = '" . $this->db->escape($data['mask']) . "', version = '" . $this->db->escape($data['version']) . "', notes = '" . $this->db->escape($data['notes']) . "', remaining = '" . (int)$data['remaining'] . "' WHERE download_id = '" . (int)$download_id . "'");]]></add>
+    </operation>
+  </file>
+
+
+
+  <file name="admin/controller/catalog/download.php">
+    <operation>
+      <search position="after"><![CDATA[$this->data['downloads'][] = array(]]></search>
+      <add><![CDATA['notes' => $result['notes'],
+ 'version' => $result['version'],]]></add>
+    </operation>
+
+    <operation>
+      <search position="after"><![CDATA[$this->data['column_name'] = $this->language->get('column_name');]]></search>
+      <add><![CDATA[$this->data['column_version'] = $this->language->get('column_version');
+ $this->data['column_notes'] = $this->language->get('column_notes');]]></add>
+    </operation>
+
+    <operation>
+      <search position="after"><![CDATA[$this->data['entry_name'] = $this->language->get('entry_name');]]></search>
+      <add><![CDATA[$this->data['entry_version'] = $this->language->get('entry_version');
+ $this->data['entry_notes'] = $this->language->get('entry_notes');]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA[(isset($this->request->post['remaining'])]]></search>
+      <add><![CDATA[
+ if (isset($this->request->post['notes'])) {
+          $this->data['notes'] = $this->request->post['notes'];
+      } elseif (!empty($download_info)) {
+          $this->data['notes'] = $download_info['notes'];
+      } else {
+          $this->data['notes'] = 1;
+      }
+ if (isset($this->request->post['version'])) {
+          $this->data['version'] = $this->request->post['version'];
+      } elseif (!empty($download_info)) {
+          $this->data['version'] = $download_info['version'];
+      } else {
+          $this->data['version'] = 1;
+      }
+
+      ]]></add>
+    </operation>
+  </file>
+
+  <file name="admin/language/english/catalog/download.php">
+    <operation>
+      <search position="after"><![CDATA[$_['column_action']    = 'Action';]]></search>
+      <add><![CDATA[$_['column_notes']    = 'Notes';
+$_['column_version']    = 'Version';
+$_['entry_notes']    = 'Notes';
+$_['entry_version']    = 'Version';]]></add>
+    </operation>
+  </file>
+
+
+
+  <file name="admin/view/template/catalog/download_form.tpl">
+
+    <operation>
+
+      <search position="before"><![CDATA[$download_id]]></search>
+
+      <add><![CDATA[
+          <tr>
+            <td><?php echo $entry_version; ?></td>
+            <td><input type='text' name="version" value="<?php echo $version; ?>" /></td>
+          </tr>
+          <tr>
+            <td><?php echo $entry_notes; ?></td>
+            <td><textarea name="notes" style="width:80%; height:400px;"><?php echo $notes; ?></textarea></td>
+          </tr>
+
+      ]]></add>
+
+    </operation>
+
+  </file>
+
+</modification>

@@ -1,0 +1,211 @@
+<html>
+  <head>
+    <title>Invoice</title>
+
+    <style type='text/css'>
+      * { font-family:verdana; font-size:10px; }
+      body { background-color:white; }
+      .contentTable { width:980px; }
+      .headerTable { width:100%; vertical-align: top; }
+      .logoBox { width:50%; }
+      .invoiceBox { width:50%; text-align:right; vertical-align: top; }
+      .mainTable { width:100%; }
+      .amsBox { width:50%; }
+      .shippingBox { width:50%; }
+      .serialTable { border-collapse:collapse; width: 100%; }
+      .serialTable tr td { width:50%; border:1px solid black; padding: 4px; text-align:center; }
+      .purchaseTable { width:100%; padding-top:10px; }
+      .headings { font-weight:bold; border-bottom:1px solid black; }
+      .headingQTY { width:10%; }
+      .headingDescription { width:50%; }
+      .headingPrice { width:20%; }
+      .headingTotal { width:20%; }
+      .lineItem { border-bottom:1px solid black; }
+      .totalHeading { text-align:right; }
+      .totals { }
+      .nelcoAd { vertical-align:bottom; }
+
+      @media print { 
+        @page { size: 8.5in 11in; margin: 0; }
+        * { font-family:verdana; font-size: 8px; }
+        .contentTable { position:relative; width:100%; height:50%; top:0; left:0; }
+        .nelcoAd b { font-weight: bold; font-size:1.5em; }
+      }
+    </style>
+
+  </head>
+  <body>
+    <?php
+      
+      $this->load->model('catalog/serial');
+
+      foreach ($orders as $order) {
+        foreach($order['product'] as $product) {
+          // How many have we printed?
+          $printed = 0;
+
+          // If we want duplicates, then lets set a variable to 2, otherwise, we only want 1.
+          $_REQUEST['duplicates'] == 'false' ? $wanted = 1 : $wanted = 2;
+
+          // If the purchase contains a serial number, we need a separate invoice for each serial number.
+          if($product['serial']) {
+            foreach($product['serial'] as $serialKey => $serial) {
+
+              // Lets print the requested number of copies...
+              while($printed < $wanted) {
+
+                // Here, we print out the actual invoice page, for each serial number.
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ?>
+
+                <!-- START AN INVOICE -->
+                <table class='contentTable'>
+                  <tr>
+                    <td>
+                      <table class='headerTable'>
+                        <tr>
+                          <td class='logoBox'>
+                            <img src='../images/logo.jpg' style='width:150px' />
+                          </td>
+                          <td class='invoiceBox'>
+                            <table width='30%' align='right'>
+                              <tr><td><nobr>Order ID:</nobr></td><td><nobr><?php echo $order['order_id']; ?></nobr></td></tr>
+                              <?php if($order['invoice_no']) { ?><tr><td><nobr>Invoice Number:</nobr></td><td><nobr><?php echo $order['invoice_no']; ?></nobr></td></tr><?php } ?>
+                              <tr><td><nobr>Payment Date:</nobr></td><td><nobr><?php echo $order['date_added']; ?></nobr></td></tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <table class='mainTable'>
+                        <tr>
+                          <td class='amsBox'>
+                            Advanced Micro Solutions<br />
+                            1709 S. State St.<br />
+                            Edmond, OK 73013<br />
+                            Sales: 800.536.1099<br />
+                            Support: 405.340.0697<br />
+                            Email: info@1099-etc.com<br />
+                            http://www.1099-etc.com<br />
+                            Tax ID:73-1270820
+                          </td>
+                          <td class='shippingBox'>
+                            <?php echo $order['shipping_address']; ?>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <table class='serialTable'>
+                        <tr>
+                          <td class='serialBox'>
+                            Serial # : <?php echo $serial . $product['featurecode'][$serialKey]; ?>
+                          </td>
+                          <td class='keyBox'>
+                            Keycode : <?php echo $this->model_catalog_serial->generate_keycode($serial . $product['featurecode'][$serialKey]); ?>
+                          </td>
+                        </tr>
+                      </table>
+                      <table class='purchaseTable'>
+                        <tr>
+                          <td class='headings headingQTY'>
+                            QTY
+                          </td>
+                          <td class='headings headingDescription'>
+                            Description
+                          </td>
+                          <td class='headings headingPrice'>
+                            Price
+                          </td>
+                          <td class='headings headingTotal'>
+                            Total
+                          </td>
+                        </tr>
+                        <!-- BEGIN LINE ITEMS -->
+                        <tr>
+                          <td class='lineItem'>
+                            1
+                          </td>
+                          <td class='lineItem'>
+                            <?php echo $product['name']; ?>
+                          </td>
+                          <td class='lineItem'>
+                            <?php echo $product['price']; ?>
+                          </td>
+                          <td class='lineItem'>
+                            <?php echo $product['price']; ?>
+                          </td>
+                        </tr>
+                        <?php foreach($product['option'] as $option) { ?>
+                          <tr>
+                            <td class='lineItem'>&nbsp;</td>
+                            <td class='lineItem'>
+                              <?php echo $option['name'] . " - " . $option['value']; ?>
+                            </td>
+                            <td class='lineItem'>&nbsp;</td>
+                            <td class='lineItem'>&nbsp;</td>
+                          </tr>
+                        <?php } ?>
+                        <!-- END LINE ITEMS -->
+                        <tr>
+                          <td rowspan='6' colspan='2' class='nelcoAd'>
+                            <b>Need Compatible Forms?</b><br />
+                            Call <a href='http://1099-etc.nelcosolutions.com/'>NELCO</a> at 800.266.4669 or visit <a href='http://1099-etc.nelcosolutions.com/'>http://1099-etc.nelcosolutions.com/</a> to order!
+                         </td>
+                       </tr>
+                       <?php foreach($order['total'] as $total) { ?>
+                         <tr>
+                           <td class='totalHeading'> 
+                             <?php echo $total['title']; ?>
+                           </td>
+                           <td class='totals'>
+                             <?php echo $total['text']; ?>
+                           </td>
+                         </tr>
+                       <?php } ?>
+                     </table>
+                   </td>
+                 </tr>
+               </table>
+               <!-- END AN INVOICE -->
+        
+<pre>
+<?php echo print_r($order); ?>
+</pre>        
+
+
+<?php        
+
+        // Increment the printed counter...
+        $printed = $printed + 1;
+      } // End while
+
+      // Reset the printed count
+      $printed = 0;
+
+    } // End foreach
+
+  } // End if product[$serial]
+
+
+
+
+
+
+
+} // End foreach
+
+
+} // end of foreach
+
+
+
+ ?>
+  </body>
+</html>
+

@@ -1,0 +1,71 @@
+<modification>
+	<id>AMS Customizations - Order History</id>
+	<version>1.5.x</version>
+	<vqmver>2.X</vqmver>
+	<author>Advanced Micro Solutions - John LeVan</author>
+
+    
+  <file name="catalog/model/account/order.php">
+
+    <operation>
+      <search position="before"><![CDATA[public function getOrderProducts($order_id)]]></search>
+      <add><![CDATA[
+   public function getProductDownloads($order_id) {
+    $query = $this->db->query("select download.download_id as download_id,download.filename as filename,download.mask as mask,download.date_added as date_added,download.notes as notes,download.version as version, download_description.name as name from download, download_description, product_to_download, order_product where download.download_id = product_to_download.download_id and (download_description.download_id = product_to_download.download_id) and (order_product.product_id = product_to_download.product_id) and (order_product.order_id = '" . (int)$order_id . "') order by download.date_added desc");
+
+    return $query->rows;
+   }
+      ]]></add>
+    </operation>
+    
+    <operation>
+      <search position="before"><![CDATA['invoice_no'              => $order_query->row['invoice_no'],]]></search>
+      <add><![CDATA['customer_id'              => $order_query->row['customer_id'], ]]></add>
+    </operation>
+
+  </file>
+
+  <file name="catalog/controller/account/order.php">
+    <operation>
+      <search position="before"><![CDATA[$products = $this->model_account_order->getOrderProducts($this->request->get['order_id']);]]></search>
+      <add><![CDATA[$downloads = $this->model_account_order->getProductDownloads($this->request->get['order_id']);
+
+            $this->data['customer_id'] = (int)$this->customer->getId();
+
+            foreach($downloads as $download) {
+              $bytes = filesize('download/' . $download['filename']);
+              if ($bytes >= 1073741824) {
+                $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+              }
+              elseif ($bytes >= 1048576) {
+                $bytes = number_format($bytes / 1048576, 2) . ' MB';
+              }
+              elseif ($bytes >= 1024) {
+                $bytes = number_format($bytes / 1024, 2) . ' KB';
+              }
+              elseif ($bytes > 1) {
+                $bytes = $bytes . ' bytes';
+              }
+              elseif ($bytes == 1) {
+                $bytes = $bytes . ' byte';
+              }
+              else {
+                $bytes = '0 bytes';
+              }
+
+              $this->data['downloads'][] = array(
+                'download_id'     => $download['download_id'],
+                'name'            => $download['name'],
+                'filename'        => $download['filename'],
+                'mask'            => $download['mask'],
+                'date_added'      => $download['date_added'],
+                'notes'           => $download['notes'],
+                'version'         => $download['version'],
+                'filesize'        => $bytes
+               );
+             }
+      ]]></add>
+    </operation>
+  </file>
+
+</modification>

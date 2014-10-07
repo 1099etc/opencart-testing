@@ -1,0 +1,49 @@
+<modification>
+	<id>AMS Customizations</id>
+	<version>1.5.x</version>
+	<vqmver>2.X</vqmver>
+	<author>Advanced Micro Solutions - John LeVan</author>
+
+  <!-- This set of XML rules modifys the order list for dawn to be able to sort out which orders need to be processed. -->
+  <file name="admin/controller/sale/order.php">
+
+    <operation>
+      <search position="before"><![CDATA[if (isset($this->request->get['filter_date_modified'])) {]]></search>
+      <add><![CDATA[
+      if (isset($this->request->get['filter_shipping_method'])) {
+//        $url .= '&filter_shipping_method=' . $this->request->get['filter_shipping_method'];
+      }
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA[$this->data['filter_date_modified'] = $filter_date_modified;]]></search>
+      <add><![CDATA[$this->data['filter_shipping_method'] = $filter_shipping_method;]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA[$this->data['sort_date_modified'] =]]></search>
+      <add><![CDATA[$this->data['sort_shipping_method'] = $this->url->link('sale/order', 'token=' . $this->session->data['token'] . '&sort=o.shipping_method' . $url, 'SSL');]]></add>
+    </operation>
+
+    <operation>
+      <search position="after"><![CDATA[$this->language->get('column_action')]]></search>
+      <add><![CDATA[$this->data['column_shipping_method'] = $this->language->get('column_shipping_method');]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA['date_modified' => date($this->language->get('date_format_short'), strtotime($result['date_modified'])),]]></search>
+      <add><![CDATA['shipping_method' => $result['shipping_method'],]]></add>
+    </operation>
+
+    <operation>
+      <search position="before"><![CDATA['filter_date_modified'   => $filter_date_modified,]]></search>
+      <add><![CDATA['filter_shipping_method'   => $filter_shipping_method,]]></add>
+    </operation>
+
+
+  </file>
+
+
+
+</modification>

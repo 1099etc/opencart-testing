@@ -1,0 +1,115 @@
+<modification>
+
+<id>Admin Save and Keep Editing</id>
+<version>155.2</version>
+<vqmver>2.3.2</vqmver>
+<author>Clear Thinking</author>
+<email>johnathan@getclearthinking.com</email>
+<website>http://www.getclearthinking.com</website>
+
+<file name="admin/language/english/english.php" error="skip">
+<operation error="skip">
+<search position="before"><![CDATA[
+?>
+]]></search>
+<add trim="true"><![CDATA[
+// Admin Save and Keep Editing
+$_['button_save_and_exit']= 'Save & Exit';
+$_['button_save_and_keep_editing']= 'Save & Keep Editing';
+]]></add>
+</operation>
+</file>
+
+<file name="admin/controller/*/*.php" error="skip">
+<operation error="skip">
+<search position="before"><![CDATA[
+$this->redirect(
+]]></search>
+<add trim="true"><![CDATA[
+if (isset($this->request->get['keepediting'])) {
+if (!empty($this->request->get['tabselected'])) {
+$this->session->data['tabselected'] = $this->request->get['tabselected'];
+} else {
+unset($this->session->data['tabselected']);
+}
+$this->redirect('http' . (isset($this->request->server['HTTPS']) && $this->request->server['HTTPS'] != 'off' ? 's' : '') . '://' . $this->request->server['HTTP_HOST'] . substr($this->request->server['REQUEST_URI'], 0, strpos($this->request->server['REQUEST_URI'], '&amp;keepediting=true')));
+}
+]]></add>
+</operation>
+</file>
+
+<file name="admin/view/template/*/*.tpl" error="skip">
+<operation error="skip">
+<search position="replace"><![CDATA[
+<?php if ($success) { ?>
+]]></search>
+<add trim="true"><![CDATA[
+<?php if (false) { ?>
+]]></add>
+</operation>
+<operation error="skip">
+<search position="before"><![CDATA[
+<div class="box">
+]]></search>
+<add trim="true"><![CDATA[
+<style type="text/css">
+.buttons {
+background: url('view/image/box.png') repeat-x;
+border: 1px solid #DDD;
+border-radius: 7px;
+box-shadow: 0 3px 6px #999;
+margin: -1px 0 0 !important;
+padding: 6px;
+position: fixed;
+right: 30px;
+}
+</style>
+<?php if (!empty($success) || isset($this->session->data['success'])) { ?>
+<div class="success"><?php echo (!empty($success)) ? $success : $this->session->data['success']; ?></div>
+<?php unset($this->session->data['success']); ?>
+<?php } ?>
+<?php if (isset($this->session->data['tabselected'])) { ?>
+<script type="text/javascript">
+$(window).load(function(){
+$('a[href="#<?php echo $this->session->data['tabselected']; ?>"]').click();
+});
+</script>
+<?php unset($this->session->data['tabselected']); ?>
+<?php } ?>
+]]></add>
+</operation>
+<!-- v1.5.1+ -->
+<operation error="skip">
+<search position="replace"><![CDATA[
+<a onclick="$('#form').submit();" class="button"><?php echo $button_save; ?></a>
+]]></search>
+<add trim="true"><![CDATA[
+<?php $route = explode('/', $this->request->get['route']); ?>
+<?php $no_ids = array('module', 'shipping', 'payment', 'total', 'feed'); ?>
+<?php if ((!in_array($route[0], $no_ids) && $route[1] != 'setting') && !strpos($this->request->server['REQUEST_URI'], '_id')) { ?>
+<a onclick="$('#form').submit();" class="button"><?php echo $button_save; ?></a>
+<?php } else { ?>
+<a onclick="$('#form').submit();" class="button"><?php echo $this->language->get('button_save_and_exit'); ?></a>
+<a onclick="$('#form').attr('action', location + '&keepediting=true' + ($('#tabs a.selected').attr('href') ? '&tabselected=' + $('#tabs a.selected').attr('href').substring(1) : '')); $('#form').submit();" class="button"><?php echo $this->language->get('button_save_and_keep_editing'); ?></a>&nbsp;
+<?php } ?>
+]]></add>
+</operation>
+<!-- v1.4.7 - v1.5.0 -->
+<operation error="skip">
+<search position="replace"><![CDATA[
+<a onclick="$('#form').submit();" class="button"><span><?php echo $button_save; ?></span></a>
+]]></search>
+<add trim="true"><![CDATA[
+<?php $route = explode('/', $this->request->get['route']); ?>
+<?php $no_ids = array('module', 'shipping', 'payment', 'total', 'feed'); ?>
+<?php if ((!in_array($route[0], $no_ids) && $route[1] != 'setting') && !strpos($this->request->server['REQUEST_URI'], '_id')) { ?>
+<a onclick="$('#form').submit();" class="button"><span><?php echo $button_save; ?></span></a>
+<?php } else { ?>
+<a onclick="$('#form').submit();" class="button"><span><?php echo $this->language->get('button_save_and_exit'); ?></span></a>
+<a onclick="$('#form').attr('action', location + '&keepediting=true' + ($('#tabs a.selected').attr('href') ? '&tabselected=' + $('#tabs a.selected').attr('href').substring(1) : '')); $('#form').submit();" class="button"><span><?php echo $this->language->get('button_save_and_keep_editing'); ?></span></a>&nbsp;
+<?php } ?>
+]]></add>
+</operation>
+</file>
+
+</modification>
