@@ -52,16 +52,6 @@
   <?php } ?>
   <br />
 </div>
-<div id="company-id-display"><span id="company-id-required" class="required">*</span> <?php echo $entry_company_id; ?><br />
-  <input type="text" name="company_id" value="" class="large-field" />
-  <br />
-  <br />
-</div>
-<div id="tax-id-display"><span id="tax-id-required" class="required">*</span> <?php echo $entry_tax_id; ?><br />
-  <input type="text" name="tax_id" value="" class="large-field" />
-  <br />
-  <br />
-</div>
 <span class="required">*</span> <?php echo $entry_address_1; ?><br />
 <input type="text" name="address_1" value="" class="large-field" />
 <br />
@@ -99,6 +89,31 @@
 <br />
 </div>
 <div style="clear: both; padding-top: 15px; border-top: 1px solid #EEEEEE;">
+
+<div id="company-id-display" style='visibility: hidden'>
+  <input type="hidden" name="company_id" value="" class="large-field" /><!--
+  <br />
+  <br /> -->
+</div>
+<div id="tax-id-display">How did you hear about us?<br />
+<input type="hidden" name="tax_id" value="" class="large-field" />
+<select name="referral">
+<option value=""></option>
+<option value="other">Other</option>
+<option value="referral">Referral from a friend / associate</option>
+<option value="previous">I have used the software before</option>
+<option value="nelco">Nelco</option>
+<option value="irs">Internal Revenue Service</option>
+<option value="cpa_practice_advisor_magazine">CPA Practice Advisor Magazine</option>
+<option value="cpapracticeadvisor.com">CPAPracticeAdvisor.com</option>
+<option value="yahoo">Yahoo</option>
+<option value="google">Google</option>
+<option value="bing">Bing</option>
+</select>
+<br />
+<br />
+</div>
+
   <input type="checkbox" name="newsletter" value="1" id="newsletter" />
   <label for="newsletter"><?php echo $entry_newsletter; ?></label>
   <br />

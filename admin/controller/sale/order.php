@@ -2515,7 +2515,7 @@ $this->data['alerts'] = $this->model_sale_alert->getOrderAlerts($order_id);
             foreach($options as $X => $O) {
 
               
-              if(stripos($O['name'], "Payroll and Printing") !== false)  {
+              if(stripos($O['name'], "Payroll and Printing") !== false && stripos($O['name'], "Upgrade") === false)  {
              
                 if(stripos($O['value'], "Software Generated Forms") !== false)  {
                   $Q = $this->db->query("SELECT " . DB_PREFIX . "product_option_value.price FROM " . DB_PREFIX . "product_option_value, " . DB_PREFIX . "option_value_description WHERE " . DB_PREFIX . "product_option_value.option_value_id = " . DB_PREFIX . "option_value_description.option_value_id and " . DB_PREFIX . "product_option_value.product_option_id = " . $O['product_option_id'] . " and " . DB_PREFIX . "option_value_description.name = 'Software Generated Forms'");
@@ -2543,7 +2543,7 @@ $Q = $this->db->query("SELECT " . DB_PREFIX . "product_option_value.price FROM "
                   $tmp_option_data[1]['name'] = 'AMS Payroll';
                   $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
                   $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
-                   $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['type'] = $O['type'];
                   $tmp_option_data[1]['price'] = number_format($Q->row['price'], 2, '.', '');
                 }
                 elseif(stripos($O['value'], "Software Generated Forms") !== false || stripos($O['value'], "No Thank You") !== false) {
@@ -2554,6 +2554,54 @@ $Q = $this->db->query("SELECT " . DB_PREFIX . "product_option_value.price FROM "
                   $tmp_option_data[1]['type'] = $O['type'];
                   $tmp_option_data[1]['price'] = '0.00';
                 }
+
+              }
+
+              // being worked on.
+              elseif(stripos($O['name'], "Payroll and Printing") !== false && stripos($O['name'], "Upgrade") !== false) {
+                if(stripos($O['value'], "Upgrade - Software Generated Forms") !== false)  {
+                  $query  = "SELECT " . DB_PREFIX . "product_option_value.price FROM " . DB_PREFIX . "product, " . DB_PREFIX . "product_option_value, " . DB_PREFIX . "option_value_description ";
+                  $query .= "WHERE " . DB_PREFIX . "product.model = right('" . $product['model'] . "',20) and " . DB_PREFIX . "option_value_description.name = 'Software Generated Forms' and ";
+                  $query .= DB_PREFIX . "option_value_description.option_value_id = " . DB_PREFIX . "product_option_value.option_value_id and " . DB_PREFIX . "product.product_id = " . DB_PREFIX . "product_option_value.product_id";
+                  $Q = $this->db->query($query);
+                  $tmp_option_data[0]['value'] = "Software Generated Forms";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = number_format($Q->row['price'], 2, '.', '');
+                }
+                elseif(stripos($O['value'], "AMS Payroll") !== false || stripos($O['value'], "No Thank You") !== false) {
+                  $tmp_option_data[0]['value'] = "No Thank You";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = '0.00';
+                }
+                if(stripos($O['value'], "Upgrade - AMS Payroll") !== false) {
+                  $query  = "SELECT " . DB_PREFIX . "product_option_value.price FROM " . DB_PREFIX . "product, " . DB_PREFIX . "product_option_value, " . DB_PREFIX . "option_value_description ";
+                  $query .= "WHERE " . DB_PREFIX . "product.model = right('" . $product['model'] . "',20) and " . DB_PREFIX . "option_value_description.name = 'AMS Payroll' and ";
+                  $query .= DB_PREFIX . "option_value_description.option_value_id = " . DB_PREFIX . "product_option_value.option_value_id and " . DB_PREFIX . "product.product_id = " . DB_PREFIX . "product_option_value.product_id";
+                  $Q = $this->db->query($query);
+                                                                        
+                  $tmp_option_data[1]['value'] = "AMS Payroll";
+                  $tmp_option_data[1]['name'] = 'AMS Payroll';
+                  $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['price'] = number_format($Q->row['price'], 2, '.', '');
+                }
+                elseif(stripos($O['value'], "Software Generated Forms") !== false || stripos($O['value'], "No Thank You") !== false) {
+                  $tmp_option_data[1]['value'] = "No Thank You";
+                  $tmp_option_data[1]['name'] = 'AMS Payroll';
+                  $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['price'] = '0.00';
+                }
+
+
 
               }
 
