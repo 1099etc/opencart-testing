@@ -373,16 +373,28 @@ if($label == 'invoice') {
                 }
                 $formsFilerPrice = number_format($formsFilerPrice, 2, '.', '');
 
-                $w2FormsFilerRowExpanded = "<tr><td class='lineItem lineQty'>" . $p['quantity'] . "</td>";
-                $w2FormsFilerRowExpanded .= "<td class='lineItem lineDesc'>W-2 / 1099 Forms Filer</td>";
-                $w2FormsFilerRowExpanded .= "<td class='lineItem linePrice'>" . $formsFilerPrice . "</td>";
-                $w2FormsFilerRowExpanded .= "<td class='lineItem lineTotal'>" . $formsFilerTotal . "</td></tr>";
+                if(stripos($p['model'], 'upg-') !== false) {
+                  $w2FormsFilerRowExpanded = "<tr><td class='lineItem lineQty'>0</td>";
+                  $w2FormsFilerRowExpanded .= "<td class='lineItem lineDesc'>W-2 / 1099 Forms Filer</td>";
+                  $w2FormsFilerRowExpanded .= "<td class='lineItem linePrice'>Not Purchased</td>";
+                  $w2FormsFilerRowExpanded .= "<td class='lineItem lineTotal'></td></tr>";
 
-                $w2FormsFilerRowCondensed = "<tr><td class='lineItem lineQty'></td>";
-                $w2FormsFilerRowCondensed .= "<td class='lineItem lineDesc'>W-2 / 1099 Forms Filer</td>";
-                $w2FormsFilerRowCondensed .= "<td class='lineItem linePrice'>Purchased</td>";
-                $w2FormsFilerRowCondensed .= "<td class='lineItem lineTotal'></td></tr>";
+                  $w2FormsFilerRowCondensed = "<tr><td class='lineItem lineQty'>0</td>";
+                  $w2FormsFilerRowCondensed .= "<td class='lineItem lineDesc'>W-2 / 1099 Forms Filer</td>";
+                  $w2FormsFilerRowCondensed .= "<td class='lineItem linePrice'>Not Purchased</td>";
+                  $w2FormsFilerRowCondensed .= "<td class='lineItem lineTotal'></td></tr>";
+                }
+                else {
+                  $w2FormsFilerRowExpanded = "<tr><td class='lineItem lineQty'>" . $p['quantity'] . "</td>";
+                  $w2FormsFilerRowExpanded .= "<td class='lineItem lineDesc'>W-2 / 1099 Forms Filer</td>";
+                  $w2FormsFilerRowExpanded .= "<td class='lineItem linePrice'>" . $formsFilerPrice . "</td>";
+                  $w2FormsFilerRowExpanded .= "<td class='lineItem lineTotal'>" . $formsFilerTotal . "</td></tr>";
 
+                  $w2FormsFilerRowCondensed = "<tr><td class='lineItem lineQty'></td>";
+                  $w2FormsFilerRowCondensed .= "<td class='lineItem lineDesc'>W-2 / 1099 Forms Filer</td>";
+                  $w2FormsFilerRowCondensed .= "<td class='lineItem linePrice'>Purchased</td>";
+                  $w2FormsFilerRowCondensed .= "<td class='lineItem lineTotal'></td></tr>";
+                }
 
                 if($option['name'] == "Software Generated Forms") {
                   $softwareGeneratedFormsRowExpanded  .= "<tr><td class='lineItem lineQty'>" . $quantity . "</td>";
