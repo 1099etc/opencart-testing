@@ -4,9 +4,11 @@ Class ModelReportUpsworldship extends Model {
 
   public function getUPSOrders($startDate = '', $endDate = '', $save = 0) {
     if($startDate == '') { $startDate = date('Y-m-d', strtotime("-1 week")); }
-    if($endDate == '') { $endDate = date('Y-m-d 24:59:59'); }
+    if($endDate == '') { $endDate = date('Y-m-d h:m:s'); }
 
-    $newOrders = $this->db->query("SELECT " . DB_PREFIX . "`order`.order_id as order_id, concat(" . DB_PREFIX . "serials_order.`key`, " . DB_PREFIX . "serials_order.featurecode) AS SERIAL, 'N' as COD, '0.00' as CODAMT, 'N' as SATDEL, concat(" . DB_PREFIX . "`order`.firstname, ' ', " . DB_PREFIX . "`order`.lastname) as NAME, " . DB_PREFIX . "`order`.shipping_company as FIRM, concat(" . DB_PREFIX . "`order`.shipping_address_1,' '," . DB_PREFIX . "`order`.shipping_address_2) as ADDRESS, " . DB_PREFIX . "`order`.shipping_city as CITY, " . DB_PREFIX . "`zone`.code as STATE, " . DB_PREFIX . "`order`.shipping_postcode as ZIP, " . DB_PREFIX . "`order`.telephone as PHONE, 'Y' as NOTIFY1_OPTION, 'Email' as NOTIFY1_TYPE, " . DB_PREFIX . "`order`.email as EMAIL, 'Next Day Air' as SERVICE, 'UPS Letter' as PKGTYPE, 'Prepaid' as BILLOPT, 'Advanced Micro Solutions' as FROM_COMPANY FROM " . DB_PREFIX . "`order`, " . DB_PREFIX . "zone, " . DB_PREFIX . "serials_order WHERE lower(" . DB_PREFIX . "`order`.shipping_method) LIKE lower('%overnight%') and " . DB_PREFIX . "`order`.shipping_zone_id = " . DB_PREFIX . "`zone`.zone_id and " . DB_PREFIX . "`order`.order_id = " . DB_PREFIX . "serials_order.oid and " . DB_PREFIX . "`order`.date_added >= '" . $startDate . "' and " . DB_PREFIX . "`order`.date_added <= '" . $endDate ."' union all SELECT " . DB_PREFIX . "`order`.order_id as order_id, '' AS SERIAL, 'N' as COD, '0.00' as CODAMT, 'N' as SATDEL, concat(" . DB_PREFIX . "`order`.firstname, ' ', " . DB_PREFIX . "`order`.lastname) as NAME, " . DB_PREFIX . "`order`.shipping_company as FIRM, concat(" . DB_PREFIX . "`order`.shipping_address_1,' '," . DB_PREFIX . "`order`.shipping_address_2) as ADDRESS, " . DB_PREFIX . "`order`.shipping_city as CITY, " . DB_PREFIX . "`zone`.code as STATE, " . DB_PREFIX . "`order`.shipping_postcode as ZIP, " . DB_PREFIX . "`order`.telephone as PHONE, 'Y' as NOTIFY1_OPTION, 'Email' as NOTIFY1_TYPE, " . DB_PREFIX . "`order`.email as EMAIL, 'Next Day Air' as SERVICE, 'UPS Letter' as PKGTYPE, 'Prepaid' as BILLOPT, 'Advanced Micro Solutions' as FROM_COMPANY FROM " . DB_PREFIX . "`order`, " . DB_PREFIX . "zone WHERE lower(" . DB_PREFIX . "`order`.shipping_method) LIKE lower('%overnight%') and " . DB_PREFIX . "`order`.shipping_zone_id = " . DB_PREFIX . "`zone`.zone_id  and " . DB_PREFIX . "`order`.date_added >= '" . $startDate . "' and " . DB_PREFIX . "`order`.date_added <= '" . $endDate ."'");
+    $q = "SELECT " . DB_PREFIX . "`order`.order_id as order_id, concat(" . DB_PREFIX . "serials_order.`key`, " . DB_PREFIX . "serials_order.featurecode) AS SERIAL, 'N' as COD, '0.00' as CODAMT, 'N' as SATDEL, concat(" . DB_PREFIX . "`order`.firstname, ' ', " . DB_PREFIX . "`order`.lastname) as NAME, " . DB_PREFIX . "`order`.shipping_company as FIRM, concat(" . DB_PREFIX . "`order`.shipping_address_1,' '," . DB_PREFIX . "`order`.shipping_address_2) as ADDR, " . DB_PREFIX . "`order`.shipping_city as CITY, " . DB_PREFIX . "`zone`.code as STATE, " . DB_PREFIX . "`order`.shipping_postcode as ZIP, " . DB_PREFIX . "`order`.telephone as PHONE, 'Y' as NOTIFY1_OPTION, 'Email' as NOTIFY1_TYPE, " . DB_PREFIX . "`order`.email as EMAIL, 'Next Day Air' as SERVICE, 'UPS Letter' as PKGTYPE, 'Prepaid' as BILLOPT, 'Advanced Micro Solutions' as FROM_COMPANY FROM " . DB_PREFIX . "`order` LEFT JOIN(" . DB_PREFIX . "serials_order) ON(" . DB_PREFIX . "serials_order.oid = " . DB_PREFIX . "`order`.order_id), " . DB_PREFIX . "zone WHERE lower(" . DB_PREFIX . "`order`.shipping_method) LIKE lower('%overnight%') and " . DB_PREFIX . "`order`.shipping_zone_id = " . DB_PREFIX . "`zone`.zone_id and " . DB_PREFIX . "`order`.date_added >= '" . $startDate . "' and " . DB_PREFIX . "`order`.date_added <= '" . $endDate ."' order by order_id desc";
+
+    $newOrders = $this->db->query($q);
 
     // set up a few variables for later.
     $oids = '';
@@ -20,6 +22,13 @@ Class ModelReportUpsworldship extends Model {
       $i = $i + 1;
       if($i < $x) { $oids .= ","; }
 
+      $order['PHONE'] = preg_replace("/[^0-9]/", "", $order['PHONE']);
+
+/*      if(strlen($order['PHONE']) == 7)
+        $order['PHONE'] = preg_replace("/([0-9]{3})([0-9]{4})/", "$1-$2", $order['PHONE']);
+      elseif(strlen($order['PHONE']) == 10)
+        $order['PHONE'] = preg_replace("/([0-9]{3})([0-9]{3})([0-9]{4})/", "($1) $2-$3", $order['PHONE']);
+*/
       // setup the return array
       $returnArray[] = array(
         'SN'         => $order['SERIAL'],
@@ -28,7 +37,7 @@ Class ModelReportUpsworldship extends Model {
         'SATDEL'         => $order['SATDEL'],
         'NAME'           => '"' . $order['NAME'] . '"',
         'FIRM'           => '"' . $order['FIRM'] . '"',
-        'ADDRESS'        => '"' . $order['ADDRESS'] . '"',
+        'ADDR'        => '"' . $order['ADDR'] . '"',
         'CITY'           => '"' . $order['CITY'] . '"',
         'STATE'          => '"' . $order['STATE'] . '"',
         'ZIP'            => '"' . $order['ZIP'] . '"',
@@ -48,6 +57,8 @@ Class ModelReportUpsworldship extends Model {
       $oids = trim($oids, ",");
       $this->db->query("INSERT INTO " . DB_PREFIX . "ups_worldship (startDate, endDate, order_ids) VALUES ('" . $startDate . "', '" . $endDate . "', '" . $oids . "')");
     }
+
+//echo $q;
 
     return $returnArray;
   }

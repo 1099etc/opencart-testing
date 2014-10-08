@@ -88,6 +88,7 @@
               <tr>
                 <td><?php echo $entry_fax; ?></td>
                 <td><input type="text" name="fax" value="<?php echo $fax; ?>" /></td>
+                <input type="text" name="derp" value="" style='display:none' />
               </tr>
               <tr>
                 <td><?php echo $entry_password; ?></td>
