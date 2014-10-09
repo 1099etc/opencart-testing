@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+<id><![CDATA[Instant Complete]]></id>
+<version><![CDATA[1.0.0]]></version>
+<vqmver><![CDATA[2.4.0]]></vqmver>
+<author><![CDATA[Aggronaut (gabor.zsupos@gmail.com)]]></author>
+<file name="admin/model/catalog/product.php">
+<operation error="skip">
+<search position="replace">
+<![CDATA[$sql .= " AND pd.name LIKE '" . $this->db->escape($data['filter_name']) . "%'";]]>
+</search>
+<add>
+<![CDATA[$sql .= " AND pd.name LIKE '%" . $this->db->escape($data['filter_name']) . "%'";]]>
+</add>
+</operation>
+<operation error="skip">
+<search position="replace">
+<![CDATA[$sql .= " AND p.model LIKE '" . $this->db->escape($data['filter_model']) . "%'";]]>
+</search>
+<add>
+<![CDATA[$sql .= " AND p.model LIKE '%" . $this->db->escape($data['filter_model']) . "%'";]]>
+</add>
+</operation>
+</file>
+<file name="admin/model/catalog/category.php">
+<operation error="skip">
+<search position="replace">
+<![CDATA[$sql .= " AND cd2.name LIKE '" . $this->db->escape($data['filter_name']) . "%'";]]>
+</search>
+<add>
+<![CDATA[$sql .= " AND cd2.name LIKE '%" . $this->db->escape($data['filter_name']) . "%'";]]>
+</add>
+</operation>
+</file>
+<file name="admin/model/catalog/filter.php">
+<operation error="skip">
+<search position="replace">
+<![CDATA[$sql .= " AND fd.name LIKE '" . $this->db->escape($data['filter_name']) . "%'";]]>
+</search>
+<add>
+<![CDATA[$sql .= " AND fd.name LIKE '%" . $this->db->escape($data['filter_name']) . "%'";]]>
+</add>
+</operation>
+</file>
+<file name="admin/model/catalog/manufacturer.php">
+<operation error="skip">
+<search position="replace">
+<![CDATA[$sql .= " WHERE name LIKE '" . $this->db->escape($data['filter_name']) . "%'";]]>
+</search>
+<add>
+<![CDATA[$sql .= " WHERE name LIKE '%" . $this->db->escape($data['filter_name']) . "%'";]]>
+</add>
+</operation>
+</file>
+<file name="admin/model/catalog/attribute.php">
+<operation error="skip">
+<search position="replace">
+<![CDATA[$sql .= " AND ad.name LIKE '" . $this->db->escape($data['filter_name']) . "%'";]]>
+</search>
+<add>
+<![CDATA[$sql .= " AND ad.name LIKE '%" . $this->db->escape($data['filter_name']) . "%'";]]>
+</add>
+</operation>
+</file>
+<file name="admin/model/catalog/option.php">
+<operation error="skip">
+<search position="replace">
+<![CDATA[$sql .= " AND od.name LIKE '" . $this->db->escape($data['filter_name']) . "%'";]]>
+</search>
+<add>
+<![CDATA[$sql .= " AND od.name LIKE '%" . $this->db->escape($data['filter_name']) . "%'";]]>
+</add>
+</operation>
+</file>
+<file name="admin/view/template/catalog/category_form.tpl">
+<operation>
+<search position="before">
+<![CDATA[<?php echo $footer; ?>]]>
+</search>
+<add>
+<![CDATA[
+<script type="text/javascript"><!--
+$('input[name=\'path\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'filter\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+]]>
+</add>
+</operation>
+<operation>
+<search position="replace">
+<![CDATA[delay: 500,]]>
+</search>
+<add>
+<![CDATA[minLength: 0, delay: 100,]]>
+</add>
+</operation>
+</file>
+<file name="admin/view/template/catalog/product_form.tpl">
+<operation>
+<search position="before">
+<![CDATA[<?php echo $footer; ?>]]>
+</search>
+<add>
+<![CDATA[
+<script type="text/javascript"><!--
+$('input[name=\'option\']').click(function(){
+$(this).catcomplete("search");
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'manufacturer\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'filter\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'category\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'download\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'related\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+]]>
+</add>
+</operation>
+<operation>
+<search position="after" index="1">
+<![CDATA[</tbody>]]>
+</search>
+<add>
+<![CDATA[
+<script type="text/javascript"><!--
+var attribute_row = 0;
+$('input[name=\'product_attribute[' + attribute_row + '][name]\']').click(function(){
+$(this).catcomplete("search");
+});
+//-->
+</script>
+]]>
+</add>
+</operation>
+<operation>
+<search position="after">
+<![CDATA[attributeautocomplete(attribute_row);]]>
+</search>
+<add>
+<![CDATA[
+$('input[name=\'product_attribute[' + attribute_row + '][name]\']').click(function(){
+$(this).catcomplete("search");
+});
+]]>
+</add>
+</operation>
+<operation>
+<search position="replace">
+<![CDATA[delay: 500,]]>
+</search>
+<add>
+<![CDATA[minLength: 0, delay: 100,]]>
+</add>
+</operation>
+</file>
+<file name="admin/view/template/catalog/product_list.tpl">
+<operation>
+<search position="before">
+<![CDATA[<?php echo $footer; ?>]]>
+</search>
+<add>
+<![CDATA[
+<script type="text/javascript"><!--
+$('input[name=\'filter_name\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'filter_model\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+]]>
+</add>
+</operation>
+<operation>
+<search position="replace">
+<![CDATA[delay: 500,]]>
+</search>
+<add>
+<![CDATA[minLength: 0, delay: 100,]]>
+</add>
+</operation>
+</file>
+<file name="admin/view/template/sale/order_form.tpl">
+<operation>
+<search position="before">
+<![CDATA[<?php echo $footer; ?>]]>
+</search>
+<add>
+<![CDATA[
+<script type="text/javascript"><!--
+$('input[name=\'product\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'customer\']').click(function(){
+$(this).catcomplete("search");
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'affiliate\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+]]>
+</add>
+</operation>
+<operation>
+<search position="replace">
+<![CDATA[delay: 500,]]>
+</search>
+<add>
+<![CDATA[minLength: 0, delay: 100,]]>
+</add>
+</operation>
+</file>
+<file name="admin/view/template/sale/order_list.tpl">
+<operation>
+<search position="before">
+<![CDATA[<?php echo $footer; ?>]]>
+</search>
+<add>
+<![CDATA[
+<script type="text/javascript"><!--
+$('input[name=\'filter_customer\']').click(function(){
+$(this).catcomplete("search");
+});
+//--></script>
+]]>
+</add>
+</operation>
+<operation>
+<search position="replace">
+<![CDATA[delay: 500,]]>
+</search>
+<add>
+<![CDATA[minLength: 0, delay: 100,]]>
+</add>
+</operation>
+</file>
+<file name="admin/view/template/sale/affiliate_list.tpl">
+<operation>
+<search position="before">
+<![CDATA[<?php echo $footer; ?>]]>
+</search>
+<add>
+<![CDATA[
+<script type="text/javascript"><!--
+$('input[name=\'filter_name\']').click(function(){
+$(this).autocomplete("search");
+});
+//--></script>
+]]>
+</add>
+</operation>
+<operation>
+<search position="replace">
+<![CDATA[delay: 500,]]>
+</search>
+<add>
+<![CDATA[minLength: 0, delay: 100,]]>
+</add>
+</operation>
+</file>
+<file name="admin/view/template/sale/customer_list.tpl">
+<operation>
+<search position="before">
+<![CDATA[<?php echo $footer; ?>]]>
+</search>
+<add>
+<![CDATA[
+<script type="text/javascript"><!--
+$('#form input').keydown(function(e) {
+if (e.keyCode == 13) {
+filter();
+}
+});
+//--></script>
+<script type="text/javascript"><!--
+$.widget('custom.catcomplete', $.ui.autocomplete, {
+_renderMenu: function(ul, items) {
+var self = this, currentCategory = '';
+
+$.each(items, function(index, item) {
+if (item.category != currentCategory) {
+ul.append('<li class="ui-autocomplete-category">' + item.category + '</li>');
+
+currentCategory = item.category;
+}
+
+self._renderItem(ul, item);
+});
+}
+});
+
+$('input[name=\'filter_name\']').catcomplete({
+minLength: 0, delay: 100,
+source: function(request, response) {
+$.ajax({
+url: 'index.php?route=sale/customer/autocomplete&token=<?php echo $token; ?>&filter_name=' +  encodeURIComponent(request.term),
+dataType: 'json',
+success: function(json) {
+response($.map(json, function(item) {
+return {
+category: item.customer_group,
+label: item.name,
+value: item.customer_id
+}
+}));
+}
+});
+}, 
+select: function(event, ui) {
+$('input[name=\'filter_name\']').val(ui.item.label);
+
+return false;
+},
+focus: function(event, ui) {
+      return false;
+         }
+         });
+         $('input[name=\'filter_email\']').catcomplete({
+         minLength: 0, delay: 100,
+         source: function(request, response) {
+         $.ajax({
+         url: 'index.php?route=sale/customer/autocomplete&token=<?php echo $token; ?>&filter_name=' +  encodeURIComponent(request.term),
+         dataType: 'json',
+         success: function(json) {
+         response($.map(json, function(item) {
+         return {
+         category: item.customer_group,
+         label: item.email,
+         value: item.customer_id
+         }
+         }));
+         }
+         });
+         }, 
+         select: function(event, ui) {
+         $('input[name=\'filter_email\']').val(ui.item.label);
+
+         return false;
+         },
+         focus: function(event, ui) {
+               return false;
+                  }
+                  });
+                  //--></script>
+                  <script type="text/javascript"><!--
+                  $('input[name=\'filter_name\']').click(function(){
+                  $(this).catcomplete("search");
+                  });
+                  //--></script>
+                  <script type="text/javascript"><!--
+                  $('input[name=\'filter_email\']').click(function(){
+                  $(this).catcomplete("search");
+                  });
+                  //--></script>
+                  ]]>
+                  </add>
+                  </operation>
+                  </file>
+                  </modification>
