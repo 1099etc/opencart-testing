@@ -167,6 +167,7 @@ $_['entry_affiliate']                         = 'Affiliate:';
 $_['entry_order_status']                      = 'Order Status:';
 $_['entry_notify']                            = 'Notify Customer:';
 $_['entry_comment']                           = 'Comment:';
+$_['entry_override']                          = 'Override Email:';
 $_['entry_shipping']                          = 'Shipping Method:';
 $_['entry_payment']                           = 'Payment Method:';
 $_['entry_coupon']                            = 'Coupon:';

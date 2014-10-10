@@ -270,7 +270,7 @@
               <?php if ($order_products) { ?>
               <?php foreach ($order_products as $order_product) { ?>
               <tr id="product-row<?php echo $product_row; ?>">
-                <td class="center" style="width: 3px;"><img src="view/image/delete.png" title="<?php echo $button_remove; ?>" alt="<?php echo $button_remove; ?>" style="cursor: pointer;" onclick="$('#product-row<?php echo $product_row; ?>').remove(); $('#button-update').trigger('click');" /></td>
+                <td class="center" style="width: 3px;"><img src="view/image/delete.png" title="<?php echo $button_remove; ?>" alt="<?php echo $button_remove; ?>" style="display: none; cursor: pointer;" onclick="$('#product-row<?php echo $product_row; ?>').remove(); $('#button-update').trigger('click');" /></td>
                 <td class="left"><?php echo $order_product['name']; ?><br />
                   <input type="hidden" name="order_product[<?php echo $product_row; ?>][order_product_id]" value="<?php echo $order_product['order_product_id']; ?>" />
                   <input type="hidden" name="order_product[<?php echo $product_row; ?>][product_id]" value="<?php echo $order_product['product_id']; ?>" />
@@ -322,19 +322,19 @@
             <tbody>
               <tr>
                 <td class="left"><?php echo $entry_product; ?></td>
-                <td class="left"><input type="text" name="product" value="" />
+                <td class="left"><input type="text" name="product" value="" disabled='disabled' />
                   <input type="hidden" name="product_id" value="" /></td>
               </tr>
               <tr id="option"></tr>
               <tr>
                 <td class="left"><?php echo $entry_quantity; ?></td>
-                <td class="left"><input type="text" name="quantity" value="1" /></td>
+                <td class="left"><input type="text" name="quantity" value="1" disabled='disabled' /></td>
               </tr>             
             </tbody>
             <tfoot>
               <tr>
                 <td class="left">&nbsp;</td>
-                <td class="left"><a id="button-product" class="button"><?php echo $button_add_product; ?></a></td>
+                <td class="left"><a id="button-product" class="button" style='display: none'><?php echo $button_add_product; ?></a></td>
               </tr>
             </tfoot>
           </table>
@@ -392,23 +392,23 @@
             <tbody>
               <tr>
                 <td class="left"><span class="required">*</span> <?php echo $entry_to_name; ?></td>
-                <td class="left"><input type="text" name="to_name" value="" /></td>
+                <td class="left"><input type="text" name="to_name" value="" disabled='disabled' /></td>
               </tr>
               <tr>
                 <td class="left"><span class="required">*</span> <?php echo $entry_to_email; ?></td>
-                <td class="left"><input type="text" name="to_email" value="" /></td>
+                <td class="left"><input type="text" name="to_email" value="" disabled='disabled' /></td>
               </tr>
               <tr>
                 <td class="left"><span class="required">*</span> <?php echo $entry_from_name; ?></td>
-                <td class="left"><input type="text" name="from_name" value="" /></td>
+                <td class="left"><input type="text" name="from_name" value="" disabled='disabled' /></td>
               </tr>
               <tr>
                 <td class="left"><span class="required">*</span> <?php echo $entry_from_email; ?></td>
-                <td class="left"><input type="text" name="from_email" value="" /></td>
+                <td class="left"><input type="text" name="from_email" value="" disabled='disabled' /></td>
               </tr>
               <tr>
                 <td class="left"><span class="required">*</span> <?php echo $entry_theme; ?></td>
-                <td class="left"><select name="voucher_theme_id">
+                <td class="left"><select name="voucher_theme_id" disabled='disabled'>
                     <?php foreach ($voucher_themes as $voucher_theme) { ?>
                     <option value="<?php echo $voucher_theme['voucher_theme_id']; ?>"><?php echo addslashes($voucher_theme['name']); ?></option>
                     <?php } ?>
@@ -416,17 +416,17 @@
               </tr>
               <tr>
                 <td class="left"><?php echo $entry_message; ?></td>
-                <td class="left"><textarea name="message" cols="40" rows="5"></textarea></td>
+                <td class="left"><textarea name="message" cols="40" rows="5" disabled='disabled'></textarea></td>
               </tr>
               <tr>
                 <td class="left"><span class="required">*</span> <?php echo $entry_amount; ?></td>
-                <td class="left"><input type="text" name="amount" value="25.00" size="5" /></td>
+                <td class="left"><input type="text" name="amount" value="25.00" size="5" disabled='disabled' /></td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td class="left">&nbsp;</td>
-                <td class="left"><a id="button-voucher" class="button"><?php echo $button_add_voucher; ?></a></td>
+                <td class="left"><a id="button-voucher" class="button" style='display: none;'><?php echo $button_add_voucher; ?></a></td>
               </tr>
             </tfoot>
           </table>
@@ -495,13 +495,14 @@
             <tbody>
               <tr>
                 <td class="left"><?php echo $entry_shipping; ?></td>
-                <td class="left"><select name="shipping">
+                <td class="left"><select name="shipping" disabled='disabled'>
                     <option value=""><?php echo $text_select; ?></option>
                     <?php if ($shipping_code) { ?>
                     <option value="<?php echo $shipping_code; ?>" selected="selected"><?php echo $shipping_method; ?></option>
                     <?php } ?>
                   </select>
                   <input type="hidden" name="shipping_method" value="<?php echo $shipping_method; ?>" />
+                  <input type="hidden"  name="shipping_description" value="<?php echo $shipping_description; ?>" />
                   <input type="hidden" name="shipping_code" value="<?php echo $shipping_code; ?>" />
                   <?php if ($error_shipping_method) { ?>
                   <span class="error"><?php echo $error_shipping_method; ?></span>
@@ -509,7 +510,7 @@
               </tr>
               <tr>
                 <td class="left"><?php echo $entry_payment; ?></td>
-                <td class="left"><select name="payment">
+                <td class="left"><select name="payment" disabled='disabled'>
                     <option value=""><?php echo $text_select; ?></option>
                     <?php if ($payment_code) { ?>
                     <option value="<?php echo $payment_code; ?>" selected="selected"><?php echo $payment_method; ?></option>
@@ -523,15 +524,15 @@
               </tr>             
               <tr>
                 <td class="left"><?php echo $entry_coupon; ?></td>
-                <td class="left"><input type="text" name="coupon" value="" /></td>
+                <td class="left"><input type="text" name="coupon" value="" disabled='disabled' /></td>
               </tr>
               <tr>
                 <td class="left"><?php echo $entry_voucher; ?></td>
-                <td class="left"><input type="text" name="voucher" value="" /></td>
+                <td class="left"><input type="text" name="voucher" value="" disabled='disabled' /></td>
               </tr>
               <tr>
                 <td class="left"><?php echo $entry_reward; ?></td>
-                <td class="left"><input type="text" name="reward" value="" /></td>
+                <td class="left"><input type="text" name="reward" value="" disabled='disabled' /></td>
               </tr>
               <tr>
                 <td class="left"><?php echo $entry_order_status; ?></td>
@@ -551,14 +552,14 @@
               </tr>
               <tr>
                 <td class="left"><?php echo $entry_affiliate; ?></td>
-                <td class="left"><input type="text" name="affiliate" value="<?php echo $affiliate; ?>" />
+                <td class="left"><input type="text" name="affiliate" value="<?php echo $affiliate; ?>" disabled='disabled' />
                   <input type="hidden" name="affiliate_id" value="<?php echo $affiliate_id; ?>" /></td>
               </tr>
             </tbody>
             <tfoot>
               <tr>
                 <td class="left">&nbsp;</td>
-                <td class="left"><a id="button-update" class="button"><?php echo $button_update_total; ?></a></td>
+                <td class="left"><a id="button-update" class="button" style='display: none'><?php echo $button_update_total; ?></a></td>
               </tr>
             </tfoot>
           </table>

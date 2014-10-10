@@ -326,14 +326,14 @@ class ControllerSaleOrder extends Controller {
         $user_group_id = $this->model_user_user->getUser($this->user->getId());
         $user_gid = $user_group_id['user_group_id'];
 
-        if($result['status'] == 'Pending') {
+//        if($result['status'] == 'Pending') {
 
   				$action[] = array(
 	  				'text' => $this->language->get('text_edit'),
 		  			'href' => $this->url->link('sale/order/update', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, 'SSL')
 			  	); 
 
-        }
+  //      }
 			}
 			
 			$this->data['orders'][] = array(
@@ -1097,6 +1097,15 @@ class ControllerSaleOrder extends Controller {
       		$this->data['shipping_code'] = '';
     	}
 
+      if (isset($this->request->post['shipping_description'])) {
+        $this->data['shipping_description'] = $this->request->post['shipping_description'];
+      } elseif (!empty($order_info)) {
+        $this->data['shipping_description'] = $order_info['shipping_description'];
+      } else {
+        $this->data['shipping_description'] = '';
+      }
+                                                
+
 		if (isset($this->request->post['order_product'])) {
 			$order_products = $this->request->post['order_product'];
 		} elseif (isset($this->request->get['order_id'])) {
@@ -1473,6 +1482,7 @@ $this->data['alerts'] = $this->model_sale_alert->getOrderAlerts($order_id);
 						
 			$this->data['entry_order_status'] = $this->language->get('entry_order_status');
 			$this->data['entry_notify'] = $this->language->get('entry_notify');
+			$this->data['entry_override'] = $this->language->get('entry_override');
 			$this->data['entry_comment'] = $this->language->get('entry_comment');
 			
 			$this->data['button_invoice'] = $this->language->get('button_invoice');
@@ -2171,7 +2181,6 @@ $this->data['alerts'] = $this->model_sale_alert->getOrderAlerts($order_id);
 		$this->data['success'] = '';
 		
 		$this->load->model('sale/order');
-	
 		if ($this->request->server['REQUEST_METHOD'] == 'POST') {
 			if (!$this->user->hasPermission('modify', 'sale/order')) { 
 				$this->data['error'] = $this->language->get('error_permission');

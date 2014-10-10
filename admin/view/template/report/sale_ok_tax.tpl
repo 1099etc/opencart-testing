@@ -25,11 +25,20 @@
       </table>
       <table class="list">
         <thead>
+          <td class="left"><?php echo $column_web; ?></td>
+          <td class="right"><?php echo $column_total; ?></td>
+        </thead>
+        <tbody>
+            <td class="left"><?php echo $column_web; ?></td>
+            <td class="right">$<?php echo number_format($web_total,2); ?></td>
+        </tbody>
+      </table>
+      <table class="list">
+        <thead>
           <tr>
-            <td class="left"><?php echo $column_date_start; ?></td>
-            <td class="left"><?php echo $column_date_end; ?></td>
-            <td class="left"><?php echo $column_title; ?></td>
-            <td class="right"><?php echo $column_orders; ?></td>
+            <td class="left"><?php echo $column_city; ?></td>
+            <td class="right"><?php echo $column_shipping; ?></td>
+            <td class="right"><?php echo $column_sales; ?></td>
             <td class="right"><?php echo $column_total; ?></td>
           </tr>
         </thead>
@@ -37,11 +46,10 @@
           <?php if ($orders) { ?>
           <?php foreach ($orders as $order) { ?>
           <tr>
-            <td class="left"><?php echo $order['date_start']; ?></td>
-            <td class="left"><?php echo $order['date_end']; ?></td>
-            <td class="left"><?php echo $order['title']; ?></td>
-            <td class="right"><?php echo $order['orders']; ?></td>
-            <td class="right"><?php echo $order['total']; ?></td>
+            <td class="left"><?php echo $order['city']; ?></td>
+            <td class="right">$<?php echo number_format($order['shipping'],2); ?></td>
+            <td class="right">$<?php echo number_format($order['sales'],2); ?></td>
+            <td class="right">$<?php echo number_format($order['total'],2); ?></td>
           </tr>
           <?php } ?>
           <?php } else { ?>
@@ -49,6 +57,16 @@
             <td class="center" colspan="5"><?php echo $text_no_results; ?></td>
           </tr>
           <?php } ?>
+          <tr>
+            <td class="center" colspan="5">&nbsp;</td>
+          </tr>
+          <tr>
+            <td class="left">Shipped Totals</td>
+            <td class="right">$<?php echo number_format($shipping_total,2); ?></td>
+            <td class="right">$<?php echo number_format($sales_total,2); ?></td>
+            <td class="right">$<?php echo number_format($grand_total,2); ?></td>
+          </tr>
+          </tr>
         </tbody>
       </table>
       <div class="pagination"><?php echo $pagination; ?></div>
@@ -57,7 +75,7 @@
 </div>
 <script type="text/javascript"><!--
 function filter() {
-	url = 'index.php?route=report/sale_tax&token=<?php echo $token; ?>';
+	url = 'index.php?route=report/sale_ok_tax&token=<?php echo $token; ?>';
 	
 	var filter_date_start = $('input[name=\'filter_date_start\']').attr('value');
 	
@@ -71,18 +89,6 @@ function filter() {
 		url += '&filter_date_end=' + encodeURIComponent(filter_date_end);
 	}
 		
-	var filter_group = $('select[name=\'filter_group\']').attr('value');
-	
-	if (filter_group) {
-		url += '&filter_group=' + encodeURIComponent(filter_group);
-	}
-	
-	var filter_order_status_id = $('select[name=\'filter_order_status_id\']').attr('value');
-	
-	if (filter_order_status_id != 0) {
-		url += '&filter_order_status_id=' + encodeURIComponent(filter_order_status_id);
-	}	
-
 	location = url;
 }
 //--></script> 

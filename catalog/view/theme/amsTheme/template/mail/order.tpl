@@ -195,29 +195,31 @@
        // echo('<pre>');
        // print_r($product['option']);
        // echo('</pre>');
+          $tmp_option_data[0]['value'] = "W-2 / 1099 Forms Filer";
+          $tmp_option_data[0]['name'] = '';
         foreach($product['option'] as $X => $O) {
           if($O['value'] == 'No Thank You') {
             //unset($product['option'][$X]);
           }
           if(stripos($O['value'], "Soft") !== false)  {
-            $tmp_option_data[0]['value'] = "Software Generated Forms";
-            $tmp_option_data[0]['name'] = '';
-          }
-          if(stripos($O['value'], "AMS Payroll") !== false) {
-            $tmp_option_data[1]['value'] = "AMS Payroll";
+            $tmp_option_data[1]['value'] = "Software Generated Forms";
             $tmp_option_data[1]['name'] = '';
           }
-          if(stripos($O['value'], "E-File Direct") !== false) {
-            $tmp_option_data[2]['value'] = "E-File Direct";
+          if(stripos($O['value'], "AMS Payroll") !== false) {
+            $tmp_option_data[2]['value'] = "AMS Payroll";
             $tmp_option_data[2]['name'] = '';
           }
-          if(stripos($O['value'], "Forms Filer Plus") !== false) {
-            $tmp_option_data[3]['value'] = "Forms Filer Plus";
+          if(stripos($O['value'], "E-File Direct") !== false) {
+            $tmp_option_data[3]['value'] = "E-File Direct";
             $tmp_option_data[3]['name'] = '';
           }
+          if(stripos($O['value'], "Forms Filer Plus") !== false) {
+            $tmp_option_data[4]['value'] = "Forms Filer Plus";
+            $tmp_option_data[4]['name'] = '';
+          }
           //if(stripos($O['name'], "Serial") !== false) {
-            //$tmp_option_data[4]['value'] = "Original Serial Number: " . $O['value'] ;
-            //$tmp_option_data[4]['name'] = '';
+            //$tmp_option_data[5]['value'] = "Original Serial Number: " . $O['value'] ;
+            //$tmp_option_data[5]['name'] = '';
           //}
 
         }

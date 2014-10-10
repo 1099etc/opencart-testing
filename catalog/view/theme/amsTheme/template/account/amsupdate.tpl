@@ -3,7 +3,7 @@
 <?php echo $column_left; ?><?php echo $column_right; ?>
 <div id="content"><?php echo $content_top; ?>
 
-  <h1><?php echo $heading_title; ?></h1>
+<!--   <h1><?php echo $heading_title; ?></h1>-->
 
   <div class="content">
 
@@ -38,10 +38,47 @@
 
     ?>
 
+<script>
+
+var params = 'year=2014&num=3';
+var httpc = new XMLHttpRequest(); // simplified for clarity
+var url = "https://shop.1099-etc.com/support/get_current_version.php";
+httpc.open("POST", url, true); // sending as POST
+
+httpc.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+httpc.onreadystatechange = function() { //Call a function when the state changes.
+if(httpc.readyState == 4 && httpc.status == 200) { // complete and no errors
+    document.getElementById("latest_update").innerHTML = httpc.responseText; // some processing here, or whatever you want to do with the response
+  }
+}
+httpc.send(params);
+
+</script>
+
+<script>
+$("#serialSearch").keyup(function(event){
+  if(event.keyCode == 13){
+    $("#submitSerialSearch").click();
+  }
+});
+</script>
+
+
+<div id="latest_update" style='display: inline-block; width: 40%'></div>
+    
+<div id='serialForm' style='display: inline-block; width: 60%; float: right; text-align: left;'>
+
 <form action='index.php'>
   <input type='hidden' name='route' value='account/amsupdate/submit' />
-      <label for='searchSerial'>Enter Your 8 Character Serial Number : </label><input type='text' maxlength='8' name='serialSearch' id='serialSearch' size='8' class='uppercase' value='<?php echo $serial; ?>' /><input type='submit' value='Go!' />
+      <!-- <label for='searchSerial'>Enter Your 8 Character Serial Number : </label> -->
+      <h3 style='padding:0px; margin: 0px;'>Download Software</h3>
+      <label for='searchSerial'>To access your downloads, please enter your 8 character serial number:</label><br />
+      <input type='text' maxlength='8' name='serialSearch' id='serialSearch' size='8' class='uppercase' value='<?php echo $serial; ?>' />
+      <input type='submit' value='Go!' id='submitSerialSearch' />
 </form>
+</div>
+
 <br /><br />
     <?php if(!empty($files)) {?>
       <?php foreach($files as $file) { ?>

@@ -35,7 +35,8 @@
 				'href' => $this->url->link('sale/order/update', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, 'SSL')
 			]]></search>
 			<add><![CDATA[
-				'href' => $this->url->link('sale/order_entry', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . '&type=default_edit', 'SSL')
+				//'href' => $this->url->link('sale/order_entry', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . '&type=default_edit', 'SSL')
+				'href' => $this->url->link('sale/order/update', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, 'SSL')
 			]]></add>
 		</operation>
 	</file>

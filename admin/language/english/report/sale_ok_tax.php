@@ -11,9 +11,10 @@ $_['text_all_status']   = 'All Statuses';
 
 // Column
 $_['column_date_start'] = 'Date Start';
-$_['column_date_end']   = 'Date End';
-$_['column_title']      = 'Tax Title';
-$_['column_orders']     = 'No. Orders';
+$_['column_web']   = 'Web Downloads';
+$_['column_city']      = 'City';
+$_['column_shipping']   = 'Shipping';
+$_['column_sales']      = 'Sales';
 $_['column_total']      = 'Total';
 
 // Entry
