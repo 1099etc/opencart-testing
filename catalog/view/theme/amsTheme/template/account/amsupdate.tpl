@@ -18,21 +18,21 @@
     <?php 
 
       if(isset($serial)) {
-        $serial = $serial;
+        $serial = strtoupper($serial);
       }
       else { $serial = ''; }
       
       if(isset($this->request->get['serial'])) {
-        $serial = $this->request->get['serial'];
+        $serial = strtoupper($this->request->get['serial']);
       }
       if(isset($this->request->post['serial'])) {
-        $serial = $this->request->post['serial'];
+        $serial = strtoupper($this->request->post['serial']);
       }
       if(isset($this->request->get['serialSearch'])) {
-        $serial = $this->request->get['serialSearch'];
+        $serial = strtoupper($this->request->get['serialSearch']);
       }
       if(isset($this->request->post['serialSearch'])) {
-        $serial = $this->request->post['serialSearch'];
+        $serial = strtoupper($this->request->post['serialSearch']);
       }
 
 
@@ -57,8 +57,9 @@ httpc.send(params);
 </script>
 
 <script>
-$("#serialSearch").keyup(function(event){
+$("#serialSearch").keydown(function(event){
   if(event.keyCode == 13){
+    event.preventDefault();
     $("#submitSerialSearch").click();
   }
 });

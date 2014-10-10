@@ -12,7 +12,7 @@ class ControllerAccountAmsupdate extends Controller {
       $serial = '';
     }
 
-    $this->data['serial'] = $serial; 
+    $this->data['serial'] = strtoupper($serial); 
 
     $this->document->setTitle('AMS Software Updates');
     $this->showPage();
@@ -41,7 +41,7 @@ class ControllerAccountAmsupdate extends Controller {
     }
 
 
-    $this->data['serial'] = $serial;
+    $this->data['serial'] = strtoupper($serial);
 
     $this->load->model('account/amsupdate');
 
@@ -91,14 +91,14 @@ class ControllerAccountAmsupdate extends Controller {
     }
 
 
-    $this->data['serial'] = $serial;
+    $this->data['serial'] = strtoupper($serial);
 
 
 
 
     $files = array();
 
-    isset($this->request->get['serialSearch']) ? $serialSearch = $this->request->get['serialSearch'] : $serialSearch = '';
+    isset($this->request->get['serialSearch']) ? $serialSearch = strtoupper($this->request->get['serialSearch']) : $serialSearch = '';
     $errors = '';
 
 // Need to add a few more checks here.
@@ -129,7 +129,7 @@ class ControllerAccountAmsupdate extends Controller {
         $this->showPage($errors, '', $serial);
       }
       else {
-
+        $featurecodes = strtoupper($featurecodes);
         $getDL = $this->model_account_amsupdate->getDownloads($serialcode, $featurecodes);
 
         if(!empty($getDL)) { 
