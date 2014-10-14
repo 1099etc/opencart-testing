@@ -101,6 +101,7 @@ $(document).ready(function () {
 });
 </script>
 
+[ <input type='checkbox' value='1' name='useBilling' id='useBilling' style='vertical-align: middle' /> Use Billing]
 [ <input type='checkbox' value='1' name='hideSerial' id='hideSerial' style='vertical-align: middle' /> Hide Serial]
 [ <input type='checkbox' value='1' name='supressNelco' id='supressNelco' style='vertical-align: middle' /> Supress Nelco]
 [ <input type='checkbox' value='1' name='notifyUser' id='notifyUser' style='vertical-align: middle' /> Notify User ]
@@ -108,6 +109,7 @@ $(document).ready(function () {
 
 <a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=true&shippinglabels=ship'); $('#form').attr('target', '_blank');
 $('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'useBilling',name:'useBilling',value:$('#useBilling').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
 $('#form').submit();" class="button">Print Shipping - X2</a>
@@ -115,24 +117,28 @@ $('#form').submit();" class="button">Print Shipping - X2</a>
 
 <a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=false&cut_order=seq&shippinglabels=ship'); $('#form').attr('target', '_blank'); 
 $('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'useBilling',name:'useBilling',value:$('#useBilling').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
 $('#form').submit();" class="button">Print Shipping</a>
 
 <a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=false&cut_order=seq&shippinglabels=invoice'); $('#form').attr('target', '_blank'); 
 $('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'useBilling',name:'useBilling',value:$('#useBilling').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
 $('#form').submit();" class="button">Print Invoice - Sequential</a>
 
 <a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=true&shippinglabels=invoice'); $('#form').attr('target', '_blank');
 $('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'useBilling',name:'useBilling',value:$('#useBilling').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
 $('#form').submit();" class="button">Print Invoice - X2</a>
 
 <a onclick="$('#form').attr('action','<?php echo $invoice; ?>&duplicates=false&shippinglabels=invoice'); $('#form').attr('target', '_blank');
 $('<input>').attr({type:'hidden',id:'notifyUser',name:'notifyUser',value:$('#notifyUser').is(':checked')}).appendTo('#form');
+$('<input>').attr({type:'hidden',id:'useBilling',name:'useBilling',value:$('#useBilling').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'supressNelco',name:'supressNelco',value:$('#supressNelco').is(':checked')}).appendTo('#form');
 $('<input>').attr({type:'hidden',id:'hideSerial',name:'hideSerial',value:$('#hideSerial').is(':checked')}).appendTo('#form');
 $('#form').submit();" class="button">Print Invoice</a>

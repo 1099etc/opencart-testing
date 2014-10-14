@@ -68,9 +68,12 @@ if($label == 'ship') {
 }
 
 
+$useBilling = $_REQUEST['useBilling'];
+
+
 /*
 echo "<pre>";
-echo print_r($orders, true);
+echo print_r($useBilling, true);
 echo "</pre>";
 exit;
 */
@@ -162,7 +165,15 @@ if($label == 'invoice') {
       $wanted = 1;
     }
 
+    if($_REQUEST['useBilling'] == 'true') {
+      $labelAddress = $order['payment_address'];
+    }
+    else {
+      $labelAddress = $order['shipping_address'];
+    }
+
     // We have currently printed 0 of our $wanted total.
+
     $printed = 0;
 
    //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -189,7 +200,7 @@ if($label == 'invoice') {
                     <!-- Tax ID: 73-1270820 -->
                   </td>
                   <td class='shippingBox'>
-                    " . str_replace('&AMP;', '&', strtoupper($order['shipping_address'])) . "
+                    " . str_replace('&AMP;', '&', strtoupper($labelAddress)) . "
                   </td>
                   <td class='invoiceBox'>
                     <table align='right'>
@@ -653,6 +664,13 @@ elseif($label == 'ship') {
       } // End SerialCount
     } // End SerialCount
 
+    if($_REQUEST['useBilling'] == 'true') {
+      $labelAddress = $order['payment_address'];
+    }
+    else {
+      $labelAddress = $order['shipping_address'];
+    }
+
     while($printed < $wanted) {
       // Now loop through each product.
       foreach($order['product'] as $p) {
@@ -660,7 +678,7 @@ elseif($label == 'ship') {
         if(isset($p['serial']) && is_array($p['serial'])) {
           foreach($p['serial'] as $serial) {
             $ship = "<div class='shippingLabel' style='page-break-after: always;'>";
-            $ship .= $order['shipping_address'];
+            $ship .= $labelAddress;
 
             if(isset($p['serial'])) {
               
@@ -685,7 +703,7 @@ elseif($label == 'ship') {
         } // If isset serial
         else {
           $ship = "<div class='shippingLabel'>";
-          $ship .= strtoupper($order['shipping_address']);
+          $ship .= strtoupper($labelAddress);
           $ship .= "</div>";
           $ship = str_replace('&AMP;', '&', $ship);
           $ship = str_replace('&amp;', '&', $ship);
