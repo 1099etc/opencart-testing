@@ -5,14 +5,18 @@
 <p><?php echo $text_payment_method; ?></p>
 <table class="radio">
   <?php foreach ($payment_methods as $payment_method) { ?>
-  <tr class="highlight">
-    <td><?php if ($payment_method['code'] == $code || !$code) { ?>
+  <tr class="highlight" style='border-bottom: 1px dotted #d3d3d3'>
+    <td style='vertical-align: top; padding-top: 10px;'><?php if ($payment_method['code'] == $code || !$code) { ?>
       <?php $code = $payment_method['code']; ?>
       <input type="radio" name="payment_method" value="<?php echo $payment_method['code']; ?>" id="<?php echo $payment_method['code']; ?>" checked="checked" />
       <?php } else { ?>
       <input type="radio" name="payment_method" value="<?php echo $payment_method['code']; ?>" id="<?php echo $payment_method['code']; ?>" />
       <?php } ?></td>
-    <td><label for="<?php echo $payment_method['code']; ?>"><?php echo $payment_method['title']; ?></label></td>
+    <td><label for="<?php echo $payment_method['code']; ?>"><?php echo $payment_method['title']; ?></label>
+      <?php if($payment_method['code'] == "authorizenet_aim") { ?>
+        <img src='images/ccards.jpg' title='We accept AMEX, MasterCard, Visa, and Discover. ' />
+      <?php } ?>
+    </td>
   </tr>
   <?php } ?>
 </table>
