@@ -1030,7 +1030,7 @@ class ModelSaleOrder extends Model {
     $mail->password = $this->config->get('config_smtp_password');
     $mail->port = $this->config->get('config_smtp_port');
     $mail->timeout = $this->config->get('config_smtp_timeout');
-    if($data['override'])
+    if(isset($data['override']))
     {
       $mail->setTo($data['override']);
     }

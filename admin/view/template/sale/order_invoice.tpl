@@ -67,19 +67,21 @@ if($label == 'ship') {
 //  rsort($orders);
 }
 
+if(isset($_REQUEST['useBilling'])) {
+  $useBilling = $_REQUEST['useBilling'];
+}
+else {
+  $useBilling = 'false';
+}
 
-$useBilling = $_REQUEST['useBilling'];
+if(isset($_REQUEST['hideSerial'])) {
+  $hideSerial = $_REQUEST['hideSerial'];
+}
+else {
+  $hideSerial = '';
+}
 
-
-/*
-echo "<pre>";
-echo print_r($useBilling, true);
-echo "</pre>";
-exit;
-*/
-
-
-$hideSerial = $_REQUEST['hideSerial'];
+$invoiceFooter = '';
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -148,6 +150,7 @@ if($label == 'invoice') {
 
   $orderPages[] = '';
   unset($orderPages);
+  $orderPages = [];
 
   //--------------------------------------------------------------------------------------------------------------------------------------------
   // End of layout and header setup
@@ -637,6 +640,7 @@ elseif($label == 'ship') {
   // Empty Shipping Label Array
   $shippingLabels[] = '';
   unset($shippingLabels);
+  $shippingLabels = [];
 
   //----------------------------------------------------------------------------------------------------------------------------------------
   // Now we loop through each order
@@ -794,12 +798,20 @@ if($label == 'ship') {
   $foot = $shippingFooter;
 }
 
+header_remove();
+
 $printable = $head . $printable . $foot;
 
 $printable = trim(preg_replace('/\s\s+/', '', $printable));
 
+$printable = trim($printable);
+
+
+
+setlocale(LC_NUMERIC, "C");
 set_include_path('/var/www/advancedmicrosolutions.net/www/opencart/dompdf/dompdf');
 require_once "dompdf_config.inc.php";
+
 $dompdf = new DOMPDF();
 
 if($label == 'invoice') {

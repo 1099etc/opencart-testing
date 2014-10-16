@@ -202,12 +202,39 @@ class Mail {
 			trigger_error('Error: E-Mail message required!');
 			exit();					
 		}
-
-		if (is_array($this->to)) {
-			$to = implode(',', $this->to);
-		} else {
-			$to = $this->to;
-		}
+    if($_SERVER['HTTP_HOST'] == 'test.shop.1099-etc.com')
+    {
+      if(is_array($this->to))
+      {
+        foreach($this->to as $key=>$value)
+        {
+          if(strpos($value, '1099-etc.com') === false)
+          {
+            $this->to[$key] = 'noreply@1099-etc.com';
+          }
+        }
+			  $to = implode(',', $this->to);
+      }
+      else
+      {
+        if(strpos($this->to, '1099-etc.com') === false)
+        {
+          $to = 'noreply@1099-etc.com';
+        }
+        else
+        {
+          $to = $this->to;
+        }
+      }
+    }
+    else
+    {
+		  if (is_array($this->to)) {
+			  $to = implode(',', $this->to);
+		  } else {
+			  $to = $this->to;
+		  }
+    }
 
 		$boundary = '----=_NextPart_' . md5(time());
 
