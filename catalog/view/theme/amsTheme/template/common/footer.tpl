@@ -20,7 +20,7 @@
     <div class="column">
       <h3>FAX</h3>
       <p>Orders and Registration<br /><b>(800) 519-1174</b></p>
-      <p>Software Technical Support<br /><b>(405) 578-1780</b></p>
+      <p>Software Technical Support Fax<br /><b>(405) 578-1780</b></p>
     </div>
     <div class="column">
       <a href='http://1099-etc.nelcosolutions.com/'><img src='catalog/view/theme/amsTheme/image/nelco.png' title='Nelco' alt='Nelco Banner' /></a>

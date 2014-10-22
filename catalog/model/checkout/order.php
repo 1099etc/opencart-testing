@@ -249,22 +249,23 @@ $Q = "SELECT featurecodeOrder, featurecode FROM `" . DB_PREFIX . "option`, `" . 
           $insertQuery = "INSERT INTO " . DB_PREFIX . "serials_order (`key`, `oid`, `pid`, `featurecode`) VALUES ('" . $sn . "', '" . $X_order_id . "', '" . $X_order_product_id . "', \"" . strtoupper($fc[0] . $fc[1] . $fc[2]) . "\")";
           $this->db->query($insertQuery);
           
-//    $X .= "---------------\n\n";
-//    $X .= "Order ID - " . $X_order_id . "\n";
-//    $X .= "Order Product ID - " . $X_order_product_id . "\n";
-//    $X .= "Product Model - " . $X_product_model . "\n";
-
-//          $X .= "Key - " . $sn . "\n\n";
-//          $X .= "FeatureCodes = ";
-//          $X .= $fc[0];
-//          $X .= $fc[1];
-//          $X .= $fc[2];
-//          $X .= "\n";
-
-
-//          error_log($X, 1, 'john.levan@1099-etc.com');
         } // End if upgrade product.
-
+        elseif(substr($order_product['model'],0,7) === 'repl-cd') {
+          // Replacement CD Serial NumbersA
+          foreach ($order_option_query->rows as $opt) {
+            if($opt['name'] == 'Replacement CD Serial') {
+              if(strlen($opt['value']) == 8) {
+                $sn = strtoupper(trim($opt['value']));    // get the serial and featurecodes
+                $sn = substr($sn, 0, -3);           // Remove the featurecodes
+                $fc = substr(trim($opt['value']), -3, 3); // Get the featurecodes
+              }
+            }
+          }
+          if(isset($sn) && strlen($sn) == 5 && strlen($fc) == 3) {
+            $insertQuery = "INSERT INTO " . DB_PREFIX . "serials_order (`key`, `oid`, `pid`, `featurecode`) VALUES ('" . strtoupper($sn) . "', '" . $X_order_id . "', '" . $X_order_product_id . "', \"" . strtoupper($fc) . "\")";
+            $this->db->query($insertQuery);
+          }
+        }
 
 				foreach ($order_option_query->rows as $option) {
 					$this->db->query("UPDATE " . DB_PREFIX . "product_option_value SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_option_value_id = '" . (int)$option['product_option_value_id'] . "' AND subtract = '1'");

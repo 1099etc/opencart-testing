@@ -2310,7 +2310,40 @@ $option_html .= "
               // Added by John
               if(substr($option_data['option_value'],0,6) == 'serial') {
                 $extraHTML = "id='serialBox'";
-              } else { $extraHTML = ''; }
+              }
+              elseif($option_data['name'] == 'Replacement CD Serial') {
+
+                $autocompletes = $this->db->query("select concat(`key`, featurecode) as SN from serials_order, `order` where  `order`.order_id = serials_order.oid and `order`.customer_id = '" . $this->session->data['customer_info']['customer_id'] . "'"); // Add CustomerID here
+                $autocomplete_string = '';
+                foreach($autocompletes->rows as $A) {
+                  $autocomplete_string .= "'" . $A['SN'] . "',";
+                }
+                $option_html .= "
+                  <script>
+                    $(document).ready(function() {
+                      $('#add_options').hide();
+                      var availableTags = [" . $autocomplete_string . "];
+                      $('#sn').autocomplete({ source: availableTags });
+                    });
+
+                    $('#sn').blur(function() {
+                      if($('#sn').val().length == 8) {
+                        $('#add_options').show();
+                      }
+                      else {
+                        $('#add_options').hide();
+                      }
+                    
+                    });
+                  </script>
+                ";
+                //comeback
+                // For future reference
+                //$option_html .= print_r($this->session->data['customer_info']['customer_id'], true);
+
+                $extraHTML = "id='sn'";
+              }
+              else { $extraHTML = ""; }
               ////////////////
 
               $option_html .= "<input type='text' name='option_oe[" . $option_data['product_option_id'] . "]' value='" . $option_data['option_value'] . "' ". $extraHTML ." />";

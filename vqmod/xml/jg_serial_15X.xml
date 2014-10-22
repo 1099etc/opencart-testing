@@ -251,7 +251,7 @@ $_['text_no_serials']      = 'No serial keys for this product';]]></add>
 
 					<div style="padding: 1px;" rel="<?php echo $k; ?>" style="font-family: monospace;">
               <span><?php echo $serial . "</span>" . $product['featurecodes'][$k] . " <b>KeyCode: </b>" . $keyCode; ?>
-              <?php if(strpos($product['model'],'upg-') === FALSE) { ?>
+              <?php if(strpos($product['model'],'upg-') === FALSE && strpos($product['model'],'repl-cd') === FALSE) { ?>
                 <img src="view/image/delete.png" class="serialRemove" alt="" />
               <?php } ?>
             </div>
@@ -262,16 +262,16 @@ $_['text_no_serials']      = 'No serial keys for this product';]]></add>
           </td>
               </tr>
 
-            <?php if(strpos($product['model'],'upg-') === FALSE) { ?>
+            <?php if(strpos($product['model'],'upg-') === FALSE && strpos($product['model'],'repl-cd') === FALSE) { ?>
               <tr style="background-color: #f8f8f8;">
                 <td>&nbsp;</td>
                 <td class="right">
-                  <?php if(strpos($product['model'],'upg-') === FALSE) { ?>
+                  <?php if(strpos($product['model'],'upg-') === FALSE && strpos($product['model'],'repl-cd') === FALSE) { ?>
                     <?php echo $text_add_serials; ?>
                   <?php } ?>
                 </td>
                 <td colspan="4"><div style="padding: 5px 1px 1px 1px;">
-                  <?php if(strpos($product['model'],'upg-') === FALSE) { ?>
+                  <?php if(strpos($product['model'],'upg-') === FALSE && strpos($product['model'],'repl-cd') === FALSE) { ?>
                     <input id="add_serial_<?php echo $product['order_product_id']; ?>" type="text" /> <img src="view/image/add.png" class="serialAdd" rel="<?php echo $product['order_product_id']; ?>" alt="" />
                   <?php } ?>
                 </div></td>

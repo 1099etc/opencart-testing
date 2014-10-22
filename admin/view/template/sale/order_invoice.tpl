@@ -350,6 +350,24 @@ if($label == 'invoice') {
             (float)$formsFilerPrice = substr($p['price'], 1);
             (float)$formsFilerTotal = substr($p['price'], 1);
 
+            if(stripos($p['model'], 'repl-cd') !== false) {
+              $w2FormsFilerRowExpanded = "<tr><td class='lineItem lineQty'>" . $p['quantity'] . "</td>";
+              $w2FormsFilerRowExpanded .= "<td class='lineItem lineDesc'>" . $p['name'] . "</td>";
+              $w2FormsFilerRowExpanded .= "<td class='lineItem linePrice'>" . $p['price'] . "</td>";
+              $w2FormsFilerRowExpanded .= "<td class='lineItem lineTotal'>" . $p['total'] . "</td></tr>";
+
+              $w2FormsFilerRowCondensed = "<tr><td class='lineItem lineQty'>" . $p['quantity'] . "</td>";
+              $w2FormsFilerRowCondensed .= "<td class='lineItem lineDesc'>" . $p['name'] . "</td>";
+              $w2FormsFilerRowCondensed .= "<td class='lineItem linePrice'>" . $p['price'] . "</td>";
+              $w2FormsFilerRowCondensed .= "<td class='lineItem lineTotal'>" . $p['total'] . "</td></tr>";
+              
+            }
+/*
+echo "<pre>";
+echo print_r($p, true);
+echo "</pre>";
+exit; 
+*/
             foreach($p['option'] as $option) {
             
               // We need to figure out if the user purchased Forms Filer, and if they did, we'll need to parse the options and put them in order.
@@ -387,10 +405,29 @@ if($label == 'invoice') {
                 }
                 $formsFilerPrice = number_format($formsFilerPrice, 2, '.', '');
 
+                if($price != 'Not Purchased') {
+                  $price = '$' . $price;
+                }
+                if($total > 0) {
+                  $total = '$' . $total;
+                }
+
+
                 if(stripos($p['model'], 'upg-') !== false) {
-                  $w2FormsFilerRowExpanded = "<tr><td class='lineItem lineQty'>0</td>";
+/*
+                  echo "<pre>";
+                  echo print_r($p, true);
+                  echo "</pre>";
+                  exit; 
+*/                  
+                  if($price == '$0.00') {
+                    $price = "<span style='font-size: .9em'>Previously Purchased</span>";
+                    $total = '';
+                  }
+
+                  $w2FormsFilerRowExpanded = "<tr><td class='lineItem lineQty'>" . $p['quantity'] . "</td>";
                   $w2FormsFilerRowExpanded .= "<td class='lineItem lineDesc'>W-2 / 1099 Forms Filer</td>";
-                  $w2FormsFilerRowExpanded .= "<td class='lineItem linePrice'>Not Purchased</td>";
+                  $w2FormsFilerRowExpanded .= "<td class='lineItem linePrice'><span style='font-size: .9em'>Previously Purchased</span></td>";
                   $w2FormsFilerRowExpanded .= "<td class='lineItem lineTotal'></td></tr>";
 
                   $w2FormsFilerRowCondensed = "<tr><td class='lineItem lineQty'>0</td>";
@@ -401,8 +438,8 @@ if($label == 'invoice') {
                 else {
                   $w2FormsFilerRowExpanded = "<tr><td class='lineItem lineQty'>" . $p['quantity'] . "</td>";
                   $w2FormsFilerRowExpanded .= "<td class='lineItem lineDesc'>W-2 / 1099 Forms Filer</td>";
-                  $w2FormsFilerRowExpanded .= "<td class='lineItem linePrice'>" . $formsFilerPrice . "</td>";
-                  $w2FormsFilerRowExpanded .= "<td class='lineItem lineTotal'>" . $formsFilerTotal . "</td></tr>";
+                  $w2FormsFilerRowExpanded .= "<td class='lineItem linePrice'>$" . $formsFilerPrice . "</td>";
+                  $w2FormsFilerRowExpanded .= "<td class='lineItem lineTotal'>$" . $formsFilerTotal . "</td></tr>";
 
                   $w2FormsFilerRowCondensed = "<tr><td class='lineItem lineQty'></td>";
                   $w2FormsFilerRowCondensed .= "<td class='lineItem lineDesc'>W-2 / 1099 Forms Filer</td>";
@@ -541,7 +578,7 @@ if($label == 'invoice') {
       }
       $firstPage .="</td><td colspan='2'><table class='totalsTable'>";
       foreach($order['total'] as $total) {
-        $firstPage .= "<tr><td class='totalHeading'>" . $total['title'] . "</td><td class='totals'>" . $total['text'] . "</td></tr>";
+        $firstPage .= "<tr><td class='totalHeading'>" . $total['title'] . "</td><td class='totals' style='padding-right:5px'>" . $total['text'] . "</td></tr>";
       } // End of Foreach Total
       $firstPage .= "</table></td></tr>";
       $firstPage .= $purchaseTableFooter;

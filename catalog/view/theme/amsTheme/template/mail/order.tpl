@@ -226,7 +226,9 @@
         $product['option'] = $tmp_option_data;
         ksort($product['option']);
       }
-
+      elseif(strpos($product['model'], "repl-cd") !== false) {
+        $product['option'] = array();
+      }
 ?>
           <?php foreach ($product['option'] as $option) { ?>
           <br />
