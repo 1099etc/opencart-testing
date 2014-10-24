@@ -2568,40 +2568,60 @@ $Q = $this->db->query("SELECT " . DB_PREFIX . "product_option_value.price FROM "
 
               // being worked on.
               elseif(stripos($O['name'], "Payroll and Printing") !== false && stripos($O['name'], "Upgrade") !== false) {
-                if(stripos($O['value'], "Software Generated Forms") !== false && stripos($O['value'], "Prepurchased Software Generated Forms") === false)  {
-                  $query  = "SELECT " . DB_PREFIX . "product_option_value.price FROM " . DB_PREFIX . "product, " . DB_PREFIX . "product_option_value, " . DB_PREFIX . "option_value_description ";
-                  $query .= "WHERE " . DB_PREFIX . "product.model = right('" . $product['model'] . "',20) and " . DB_PREFIX . "option_value_description.name = 'Software Generated Forms' and ";
-                  $query .= DB_PREFIX . "option_value_description.option_value_id = " . DB_PREFIX . "product_option_value.option_value_id and " . DB_PREFIX . "product.product_id = " . DB_PREFIX . "product_option_value.product_id";
-                  $Q = $this->db->query($query);
-                  $tmp_option_data[0]['value'] = "Software Generated Forms";
-                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
-                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
-                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
-                  $tmp_option_data[0]['type'] = $O['type'];
-                  $tmp_option_data[0]['price'] = number_format($Q->row['price'], 2, '.', '');
-                }
-                elseif(stripos($O['value'], "AMS Payroll") !== false || stripos($O['value'], "No Thank You") !== false) {
+
+                // Get the price of Software Generated Forms
+                $query= "SELECT " . DB_PREFIX . "product_option_value.price FROM " . DB_PREFIX . "product, " . DB_PREFIX . "product_option_value, " . DB_PREFIX . "option_value_description ";
+                $query .= "WHERE " . DB_PREFIX . "product.model = right('" . $product['model'] . "',20) and " . DB_PREFIX . "option_value_description.name = 'Software Generated Forms' and ";
+                $query .= DB_PREFIX . "option_value_description.option_value_id = " . DB_PREFIX . "product_option_value.option_value_id and " . DB_PREFIX . "product.product_id = " . DB_PREFIX . "product_option_value.product_id";
+                $SGF_Price = $this->db->query($query);
+
+                // Get the price of AMS Payroll
+                $query= "SELECT " . DB_PREFIX . "product_option_value.price FROM " . DB_PREFIX . "product, " . DB_PREFIX . "product_option_value, " . DB_PREFIX . "option_value_description ";
+                $query .= "WHERE " . DB_PREFIX . "product.model = right('" . $product['model'] . "',20) and " . DB_PREFIX . "option_value_description.name = 'AMS Payroll' and ";
+                $query .= DB_PREFIX . "option_value_description.option_value_id = " . DB_PREFIX . "product_option_value.option_value_id and " . DB_PREFIX . "product.product_id = " . DB_PREFIX . "product_option_value.product_id";
+                $AMS_Price = $this->db->query($query);
+
+                if($O['value'] == 'Prepurchased - AMS Payroll'){
+                // SGF - NP / Pay - PP
                   $tmp_option_data[0]['value'] = "No Thank You";
                   $tmp_option_data[0]['name'] = 'Software Generated Forms';
                   $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
                   $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
                   $tmp_option_data[0]['type'] = $O['type'];
                   $tmp_option_data[0]['price'] = '0.00';
-                }
-                if(stripos($O['value'], "AMS Payroll") !== false && stripos($O['value'], "Prepurchased AMS Payroll") === false) {
-                  $query  = "SELECT " . DB_PREFIX . "product_option_value.price FROM " . DB_PREFIX . "product, " . DB_PREFIX . "product_option_value, " . DB_PREFIX . "option_value_description ";
-                  $query .= "WHERE " . DB_PREFIX . "product.model = right('" . $product['model'] . "',20) and " . DB_PREFIX . "option_value_description.name = 'AMS Payroll' and ";
-                  $query .= DB_PREFIX . "option_value_description.option_value_id = " . DB_PREFIX . "product_option_value.option_value_id and " . DB_PREFIX . "product.product_id = " . DB_PREFIX . "product_option_value.product_id";
-                  $Q = $this->db->query($query);
-                                                                        
+
                   $tmp_option_data[1]['value'] = "AMS Payroll";
                   $tmp_option_data[1]['name'] = 'AMS Payroll';
                   $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
                   $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
                   $tmp_option_data[1]['type'] = $O['type'];
-                  $tmp_option_data[1]['price'] = number_format($Q->row['price'], 2, '.', '');
+                  $tmp_option_data[1]['price'] = '0.00';
                 }
-                elseif(stripos($O['value'], "Software Generated Forms") !== false || stripos($O['value'], "No Thank You") !== false) {
+                elseif($O['value'] == 'Upgrade - AMS Payroll') {
+                  // SGF - NP / Pay - U
+                  $tmp_option_data[0]['value'] = "No Thank You";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = '0.00';
+                
+                  $tmp_option_data[1]['value'] = "AMS Payroll";
+                  $tmp_option_data[1]['name'] = 'AMS Payroll';
+                  $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['price'] = number_format($AMS_Price->row['price'], 2, '.', '');
+                }
+                elseif($O['value'] == 'Prepurchased - Software Generated Forms') {
+                  // SGF - PP / Pay - NP
+                  $tmp_option_data[0]['value'] = "Software Generated Forms";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = '0.00';
+                
                   $tmp_option_data[1]['value'] = "No Thank You";
                   $tmp_option_data[1]['name'] = 'AMS Payroll';
                   $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
@@ -2609,7 +2629,102 @@ $Q = $this->db->query("SELECT " . DB_PREFIX . "product_option_value.price FROM "
                   $tmp_option_data[1]['type'] = $O['type'];
                   $tmp_option_data[1]['price'] = '0.00';
                 }
-
+                elseif($O['value'] == 'Prepurchased - AMS Payroll and Software Forms Generation') {
+                  // SGF - PP / Pay - PP
+                  $tmp_option_data[0]['value'] = "Software Generated Forms";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = '0.00';
+                
+                  $tmp_option_data[1]['value'] = "AMS Payroll";
+                  $tmp_option_data[1]['name'] = 'AMS Payroll';
+                  $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['price'] = '0.00';
+                }
+                elseif($O['value'] == 'Upgrade - AMS Payroll with Prepurchased Software Generated Forms') {
+                  // SGF - PP / Pay - U
+                  $tmp_option_data[0]['value'] = "Software Generated Forms";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = '0.00';
+                 
+                  $tmp_option_data[1]['value'] = "AMS Payroll";
+                  $tmp_option_data[1]['name'] = 'AMS Payroll';
+                  $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['price'] = number_format($AMS_Price->row['price'], 2, '.', '');
+                }
+                elseif($O['value'] == 'Upgrade - Software Generated Forms') {
+                  // SGF - U / Pay - NP
+                  $tmp_option_data[0]['value'] = "Software Generated Forms";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = number_format($SGF_Price->row['price'], 2, '.', '');
+                
+                  $tmp_option_data[1]['value'] = "No Thank You";
+                  $tmp_option_data[1]['name'] = 'AMS Payroll';
+                  $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['price'] = '0.00';
+                }
+                elseif($O['value'] == 'Upgrade - Software Generated Forms with Prepurchased AMS Payroll') {
+                  // SGF - U / Pay - PP
+                  $tmp_option_data[0]['value'] = "Software Generated Forms";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = number_format($SGF_Price->row['price'], 2, '.', '');
+                 
+                  $tmp_option_data[1]['value'] = "AMS Payroll";
+                  $tmp_option_data[1]['name'] = 'AMS Payroll';
+                  $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['price'] = '0.00';
+                }
+                elseif($O['value'] == 'Upgrade - AMS Payroll and Software Generated Forms') {
+                  // SGF - U / Pay - U
+                  $tmp_option_data[0]['value'] = "Software Generated Forms";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = number_format($SGF_Price->row['price'], 2, '.', '');
+                
+                  $tmp_option_data[1]['value'] = "AMS Payroll";
+                  $tmp_option_data[1]['name'] = 'AMS Payroll';
+                  $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['price'] = number_format($AMS_Price->row['price'], 2, '.', '');
+                }
+                else {
+                  // SGF - NP / Pay - NP
+                  $tmp_option_data[0]['value'] = "No Thank You";
+                  $tmp_option_data[0]['name'] = 'Software Generated Forms';
+                  $tmp_option_data[0]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[0]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[0]['type'] = $O['type'];
+                  $tmp_option_data[0]['price'] = '0.00';
+                
+                  $tmp_option_data[1]['value'] = "No Thank You";
+                  $tmp_option_data[1]['name'] = 'AMS Payroll';
+                  $tmp_option_data[1]['product_option_value_id'] = $O['product_option_value_id'];
+                  $tmp_option_data[1]['product_option_id'] = $O['product_option_id'];
+                  $tmp_option_data[1]['type'] = $O['type'];
+                  $tmp_option_data[1]['price'] = '0.00';
+                }
 
 
               }
