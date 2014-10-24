@@ -10,10 +10,11 @@
 				$this->data['text_zone'] = $this->language->get('text_zone');
 			]]></search>
 			<add><![CDATA[
-				$this->data['text_upsworldship'] = $this->language->get('text_upsworldship');
-				$this->data['text_nelcoweekly']  = $this->language->get('text_nelcoweekly');
-				$this->data['text_sale_ok_tax']  = $this->language->get('text_sale_ok_tax');
-				$this->data['text_reorder']  = $this->language->get('text_reorder');
+				$this->data['text_upsworldship']  = $this->language->get('text_upsworldship');
+				$this->data['text_nelcoweekly']   = $this->language->get('text_nelcoweekly');
+				$this->data['text_sale_ok_tax']   = $this->language->get('text_sale_ok_tax');
+				$this->data['text_reorder']       = $this->language->get('text_reorder');
+				$this->data['text_unpaidInvoice'] = $this->language->get('text_unpaidInvoice');
 			]]></add>
 		</operation>
 		<operation>
@@ -21,10 +22,11 @@
 				$this->data['home'] = $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL');
 			]]></search>
 			<add><![CDATA[
-				$this->data['upsworldship'] = $this->url->link('report/upsworldship', 'token=' . $this->session->data["token"], 'SSL'); 
-				$this->data['nelcoweekly']  = $this->url->link('report/nelcoweekly', 'token=' . $this->session->data["token"], 'SSL'); 
-				$this->data['sale_ok_tax']  = $this->url->link('report/sale_ok_tax', 'token=' . $this->session->data["token"], 'SSL'); 
-				$this->data['reorder']  = $this->url->link('report/reorder', 'token=' . $this->session->data["token"], 'SSL'); 
+				$this->data['upsworldship']  = $this->url->link('report/upsworldship', 'token=' . $this->session->data["token"], 'SSL'); 
+				$this->data['nelcoweekly']   = $this->url->link('report/nelcoweekly', 'token=' . $this->session->data["token"], 'SSL'); 
+				$this->data['sale_ok_tax']   = $this->url->link('report/sale_ok_tax', 'token=' . $this->session->data["token"], 'SSL'); 
+				$this->data['reorder']       = $this->url->link('report/reorder', 'token=' . $this->session->data["token"], 'SSL'); 
+				$this->data['unpaidInvoice'] = $this->url->link('report/unpaidInvoice', 'token=' . $this->session->data["token"], 'SSL'); 
 			]]></add>
 		</operation>
 	</file>
@@ -35,10 +37,11 @@
 				// Text
 			]]></search>
 			<add><![CDATA[
-				$_['text_upsworldship']                 = 'UPS World Ship';
-				$_['text_nelcoweekly']                  = 'Nelco Weekly';
-				$_['text_sale_ok_tax']                  = 'OK Sales Tax';
-				$_['text_reorder']                  = 'Reorder Report';
+				$_['text_upsworldship']  = 'UPS World Ship';
+				$_['text_nelcoweekly']   = 'Nelco Weekly';
+				$_['text_sale_ok_tax']   = 'OK Sales Tax';
+				$_['text_reorder']       = 'Reorder Report';
+				$_['text_unpaidInvoice'] = 'Unpaid Invoices';
 			]]></add>
 		</operation>
 	</file>
@@ -51,6 +54,7 @@
 				<li><a href="<?php echo $upsworldship; ?>"><?php echo $text_upsworldship; ?></a></li>
 				<li><a href="<?php echo $sale_ok_tax; ?>"><?php echo $text_sale_ok_tax; ?></a></li>
 				<li><a href="<?php echo $reorder; ?>"><?php echo $text_reorder; ?></a></li>
+				<li><a href="<?php echo $unpaidInvoice; ?>"><?php echo $text_unpaidInvoice; ?></a></li>
 			]]></add>
 		</operation>
 	</file>
