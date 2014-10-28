@@ -3646,8 +3646,8 @@ $option_html .= "
 		} elseif (isset($this->session->data['customer_info'])) {
 			$data['customer_id'] = $this->session->data['customer_info']['customer_id'];
 			$data['customer_group_id'] = $this->session->data['customer_info']['customer_group_id'];
-			$data['firstname'] = $this->session->data['payment_address']['firstname'];
-			$data['lastname'] = $this->session->data['payment_address']['lastname'];
+			$data['firstname'] = $this->session->data['customer_info']['firstname'];
+			$data['lastname'] = $this->session->data['customer_info']['lastname'];
 			$data['email'] = $this->session->data['customer_info']['email'];
 			$data['telephone'] = $this->session->data['customer_info']['telephone'];
 			$data['fax'] = $this->session->data['customer_info']['fax'];
@@ -3677,8 +3677,8 @@ foreach($Z as $y) {
 			//echo json_encode('No customer selected - guest not being used!');
 			//break;
 		}
-		$data['payment_firstname'] = $data['firstname'];
-		$data['payment_lastname'] = $data['lastname'];	
+		$data['payment_firstname'] = $payment_address['firstname'];
+		$data['payment_lastname'] = $payment_address['lastname'];	
 		$data['payment_company'] = $payment_address['company'];	
 		if (isset($payment_address['company_id'])) {
 			$data['payment_company_id'] = $payment_address['company_id'];	
