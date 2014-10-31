@@ -178,35 +178,46 @@ if($label == 'invoice') {
     if($_REQUEST['useBilling'] == 'true') {
 //      $labelAddress = $order['payment_address'];
 
-      $labelAddress  = $order_info['payment_firstname'] . " " . $order_info['payment_lastname'] . "\n";
-      $labelAddress .= $order_info['payment_company'] . "\n";
-      $labelAddress .= $order_info['payment_address_1'] . "\n";
+      $labelAddress  = $order['payment_firstname'] . " " . $order['payment_lastname'] . "\n";
+      if($order['payment_company'] != '') {
+        $labelAddress .= $order['payment_company'] . "\n";
+      }
+      $labelAddress .= $order['payment_address_1'] . "\n";
 
-      if($order_info['shipping_address_2'] != '') {
-        $labelAddress .= $order_info['payment_address_2'] . "\n";
+      if($order['shipping_address_2'] != '') {
+        $labelAddress .= $order['payment_address_2'] . "\n";
       }
 
-      $labelAddress .= $order_info['payment_city'] . ", " . $order_info['payment_zone_code'] . " " . $order_info['payment_postcode'];
-      if($order_info['payment_country'] != 'United States') {
-        $labelAddress .= "\n" . $order_info['payment_country'];
+      $labelAddress .= $order['payment_city'] . ", " . $order['payment_zone_code'] . " " . $order['payment_postcode'];
+      if($order['payment_country'] != 'United States') {
+        $labelAddress .= "\n" . $order['payment_country'];
       }
 
     }
     else {
       //      $labelAddress = $order['shipping_address'];
 
-      $labelAddress  = $order_info['shipping_firstname'] . " " . $order_info['shipping_lastname'] . "\n";
-      $labelAddress .= $order_info['shipping_company'] . "\n";
-      $labelAddress .= $order_info['shipping_address_1'] . "\n";
-      if($order_info['shipping_address_2'] != '') {
-        $labelAddress .= $order_info['shipping_address_2'] . "\n";
+      $labelAddress  = $order['shipping_firstname'] . " " . $order['shipping_lastname'] . "\n";
+      if($order['shipping_company'] != '') {
+        $labelAddress .= $order['shipping_company'] . "\n";
       }
-      $labelAddress .= $order_info['shipping_city'] . ", " . $order_info['shipping_zone_code'] . " " . $order_info['shipping_postcode'];
-      if($order_info['shipping_country'] != 'United States') {
-        $labelAddress .= "\n" . $order_info['shipping_country'];
+      $labelAddress .= $order['shipping_address_1'] . "\n";
+      if($order['shipping_address_2'] != '') {
+        $labelAddress .= $order['shipping_address_2'] . "\n";
+      }
+      $labelAddress .= $order['shipping_city'] . ", " . $order['shipping_zone_code'] . " " . $order['shipping_postcode'];
+      if($order['shipping_country'] != 'United States') {
+        $labelAddress .= "\n" . $order['shipping_country'];
       }
     }
     $labelAddress = str_replace("\n",'<br />',$labelAddress);
+
+
+//echo "<pre>";
+//echo print_r($order, true);
+//echo "</pre>";
+//exit;
+
 
     // We have currently printed 0 of our $wanted total.
 
@@ -741,34 +752,38 @@ elseif($label == 'ship') {
     if($_REQUEST['useBilling'] == 'true') {
 //      $labelAddress = $order['payment_address'];
 
-      $labelAddress  = $order_info['payment_firstname'] . " " . $order_info['payment_lastname'] . "\n";
-      $labelAddress .= $order_info['payment_company'] . "\n";
-      $labelAddress .= $order_info['payment_address_1'] . "\n";
+      $labelAddress  = $order['payment_firstname'] . " " . $order['payment_lastname'] . "\n";
+      if($order['payment_company'] != '') {
+        $labelAddress .= $order['payment_company'] . "\n";
+      }
+      $labelAddress .= $order['payment_address_1'] . "\n";
 
-      if($order_info['shipping_address_2'] != '') {
-        $labelAddress .= $order_info['payment_address_2'] . "\n";
+      if($order['shipping_address_2'] != '') {
+        $labelAddress .= $order['payment_address_2'] . "\n";
       }
 
-      $labelAddress .= $order_info['payment_city'] . ", " . $order_info['payment_zone_code'] . " " . $order_info['payment_postcode'];
-      if($order_info['payment_country'] != 'United States') {
-        $labelAddress .= "\n" . $order_info['payment_country'];
+      $labelAddress .= $order['payment_city'] . ", " . $order['payment_zone_code'] . " " . $order['payment_postcode'];
+      if($order['payment_country'] != 'United States') {
+        $labelAddress .= "\n" . $order['payment_country'];
       }
 
     }
     else {
 //      $labelAddress = $order['shipping_address'];
 
-      $labelAddress  = $order_info['shipping_firstname'] . " " . $order_info['shipping_lastname'] . "\n";
-      $labelAddress .= $order_info['shipping_company'] . "\n";
-      $labelAddress .= $order_info['shipping_address_1'] . "\n";
+      $labelAddress  = $order['shipping_firstname'] . " " . $order['shipping_lastname'] . "\n";
+      if($order['shipping_company'] != '') {
+        $labelAddress .= $order['shipping_company'] . "\n";
+      }
+      $labelAddress .= $order['shipping_address_1'] . "\n";
 
-      if($order_info['shipping_address_2'] != '') {
-        $labelAddress .= $order_info['shipping_address_2'] . "\n";
+      if($order['shipping_address_2'] != '') {
+        $labelAddress .= $order['shipping_address_2'] . "\n";
       }
 
-      $labelAddress .= $order_info['shipping_city'] . ", " . $order_info['shipping_zone_code'] . " " . $order_info['shipping_postcode'];
-      if($order_info['shipping_country'] != 'United States') {
-        $labelAddress .= "\n" . $order_info['shipping_country'];
+      $labelAddress .= $order['shipping_city'] . ", " . $order['shipping_zone_code'] . " " . $order['shipping_postcode'];
+      if($order['shipping_country'] != 'United States') {
+        $labelAddress .= "\n" . $order['shipping_country'];
       }
     }
 

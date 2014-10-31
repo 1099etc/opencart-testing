@@ -2881,7 +2881,31 @@ $Q = $this->db->query("SELECT " . DB_PREFIX . "product_option_value.price FROM "
 					'product'            => $product_data,
 					'voucher'            => $voucher_data,
 					'total'              => $total_data,
-					'comment'            => nl2br($order_info['comment'])
+					'comment'            => nl2br($order_info['comment']),
+          'payment_firstname'  => $order_info['payment_firstname'],
+          'payment_lastname'   => $order_info['payment_lastname'],
+          'payment_company'    => $order_info['payment_company'],
+          'payment_address_1'  => $order_info['payment_address_1'],
+          'payment_address_2'  => $order_info['payment_address_2'],
+          'payment_postcode'   => $order_info['payment_postcode'],
+          'payment_city'       => $order_info['payment_city'],
+          'payment_zone'       => $order_info['payment_zone'],
+          'payment_zone_code'  => $order_info['payment_zone_code'],
+          'payment_country_id' => $order_info['payment_country_id'],
+          'payment_country'    => $order_info['payment_country'],
+
+          'shipping_firstname'  => $order_info['shipping_firstname'],
+          'shipping_lastname'   => $order_info['shipping_lastname'],
+          'shipping_company'    => $order_info['shipping_company'],
+          'shipping_address_1'  => $order_info['shipping_address_1'],
+          'shipping_address_2'  => $order_info['shipping_address_2'],
+          'shipping_postcode'   => $order_info['shipping_postcode'],
+          'shipping_city'       => $order_info['shipping_city'],
+          'shipping_zone'       => $order_info['shipping_zone'],
+          'shipping_zone_code'  => $order_info['shipping_zone_code'],
+          'shipping_country_id' => $order_info['shipping_country_id'],
+          'shipping_country'    => $order_info['shipping_country']
+
 				);
 
         $this->data['order_info'] = $order_info;
