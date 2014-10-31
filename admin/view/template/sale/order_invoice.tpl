@@ -175,6 +175,39 @@ if($label == 'invoice') {
       $labelAddress = $order['shipping_address'];
     }
 
+    if($_REQUEST['useBilling'] == 'true') {
+//      $labelAddress = $order['payment_address'];
+
+      $labelAddress  = $order_info['payment_firstname'] . " " . $order_info['payment_lastname'] . "\n";
+      $labelAddress .= $order_info['payment_company'] . "\n";
+      $labelAddress .= $order_info['payment_address_1'] . "\n";
+
+      if($order_info['shipping_address_2'] != '') {
+        $labelAddress .= $order_info['payment_address_2'] . "\n";
+      }
+
+      $labelAddress .= $order_info['payment_city'] . ", " . $order_info['payment_zone_code'] . " " . $order_info['payment_postcode'];
+      if($order_info['payment_country'] != 'United States') {
+        $labelAddress .= "\n" . $order_info['payment_country'];
+      }
+
+    }
+    else {
+      //      $labelAddress = $order['shipping_address'];
+
+      $labelAddress  = $order_info['shipping_firstname'] . " " . $order_info['shipping_lastname'] . "\n";
+      $labelAddress .= $order_info['shipping_company'] . "\n";
+      $labelAddress .= $order_info['shipping_address_1'] . "\n";
+      if($order_info['shipping_address_2'] != '') {
+        $labelAddress .= $order_info['shipping_address_2'] . "\n";
+      }
+      $labelAddress .= $order_info['shipping_city'] . ", " . $order_info['shipping_zone_code'] . " " . $order_info['shipping_postcode'];
+      if($order_info['shipping_country'] != 'United States') {
+        $labelAddress .= "\n" . $order_info['shipping_country'];
+      }
+    }
+    $labelAddress = str_replace("\n",'<br />',$labelAddress);
+
     // We have currently printed 0 of our $wanted total.
 
     $printed = 0;
@@ -706,11 +739,40 @@ elseif($label == 'ship') {
     } // End SerialCount
 
     if($_REQUEST['useBilling'] == 'true') {
-      $labelAddress = $order['payment_address'];
+//      $labelAddress = $order['payment_address'];
+
+      $labelAddress  = $order_info['payment_firstname'] . " " . $order_info['payment_lastname'] . "\n";
+      $labelAddress .= $order_info['payment_company'] . "\n";
+      $labelAddress .= $order_info['payment_address_1'] . "\n";
+
+      if($order_info['shipping_address_2'] != '') {
+        $labelAddress .= $order_info['payment_address_2'] . "\n";
+      }
+
+      $labelAddress .= $order_info['payment_city'] . ", " . $order_info['payment_zone_code'] . " " . $order_info['payment_postcode'];
+      if($order_info['payment_country'] != 'United States') {
+        $labelAddress .= "\n" . $order_info['payment_country'];
+      }
+
     }
     else {
-      $labelAddress = $order['shipping_address'];
+//      $labelAddress = $order['shipping_address'];
+
+      $labelAddress  = $order_info['shipping_firstname'] . " " . $order_info['shipping_lastname'] . "\n";
+      $labelAddress .= $order_info['shipping_company'] . "\n";
+      $labelAddress .= $order_info['shipping_address_1'] . "\n";
+
+      if($order_info['shipping_address_2'] != '') {
+        $labelAddress .= $order_info['shipping_address_2'] . "\n";
+      }
+
+      $labelAddress .= $order_info['shipping_city'] . ", " . $order_info['shipping_zone_code'] . " " . $order_info['shipping_postcode'];
+      if($order_info['shipping_country'] != 'United States') {
+        $labelAddress .= "\n" . $order_info['shipping_country'];
+      }
     }
+
+    $labelAddress = str_replace("\n",'<br />',$labelAddress);
 
     while($printed < $wanted) {
       // Now loop through each product.

@@ -2883,6 +2883,8 @@ $Q = $this->db->query("SELECT " . DB_PREFIX . "product_option_value.price FROM "
 					'total'              => $total_data,
 					'comment'            => nl2br($order_info['comment'])
 				);
+
+        $this->data['order_info'] = $order_info;
 			}
 		}
 
