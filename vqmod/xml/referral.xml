@@ -122,7 +122,8 @@
                   <td><select name="referral">
                     <?php echo $referral; 
 
-                      $referrers = array( 'other' => 'Other',
+                      $referrers = array( '' => '',
+                                          'other' => 'Other',
                                           'referral' => 'Referral from a friend / associate',
                                           'previous' => 'I have used the software before',
                                           'nelco' => 'Nelco',
