@@ -76,7 +76,7 @@ class ModelSaleCustomer extends Model {
 		}
 		
 		if (!empty($data['filter_email'])) {
-			$implode[] = "c.email LIKE '" . $this->db->escape($data['filter_email']) . "%'";
+			$implode[] = "c.email LIKE '%" . $this->db->escape($data['filter_email']) . "%'";
 		}
 
 		if (isset($data['filter_newsletter']) && !is_null($data['filter_newsletter'])) {
@@ -264,11 +264,11 @@ class ModelSaleCustomer extends Model {
 		$implode = array();
 		
 		if (!empty($data['filter_name'])) {
-			$implode[] = "CONCAT(firstname, ' ', lastname) LIKE '%" . $this->db->escape($data['filter_name']) . "%'";
+			$implode[] = "CONCAT(ca.firstname, ' ', ca.lastname) LIKE '%" . $this->db->escape($data['filter_name']) . "%'";
 		}
 		
 		if (!empty($data['filter_email'])) {
-			$implode[] = "email LIKE '" . $this->db->escape($data['filter_email']) . "%'";
+			$implode[] = "email LIKE '%" . $this->db->escape($data['filter_email']) . "%'";
 		}
 		
 		if (isset($data['filter_newsletter']) && !is_null($data['filter_newsletter'])) {

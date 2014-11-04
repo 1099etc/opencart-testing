@@ -128,15 +128,43 @@ $_['text_no_serials']      = 'No serial keys for this product';]]></add>
 ?>
     <p class='expanderHeading' style='margin:0px; padding:0px'>[ Contains Multiple Serials - Click to Expand / Collapse ]</p>
     <div class='expanderContent'>
-      <?php echo str_replace(",","<br />",$order['serial']); ?>
+      <?php
+      $serials = explode(',',$order['serial']);
+      $this->load->model('catalog/serial');
+      foreach($serials as $s) {
+        $SN = $this->db->query("SELECT CONCAT(`key`, '', `featurecode`) as SN FROM " . DB_PREFIX . "serials_order WHERE `oid` = '" . $order['order_id'] . "' and `key` = '" . $s . "'");
+        $KC = $this->model_catalog_serial->generate_keycode($SN->row['SN']);
+        ?>
+        <a class="tooltip"><?php echo $SN->row['SN']; ?>
+          <span><img class="callout" src="view/image/callout.gif" /><strong><?php echo $SN->row['SN']; ?></strong> : <strong><?php echo $KC; ?></strong></span>
+        </a><br /> 
+
+        <?php
+      }
+
+      ?>
+
     </div>
 
 <?php
   }
-  else {
-    echo str_replace(",","<br />",$order['serial']); 
+  else { ?>
+
+    <?php
+      if(isset($order['serial']) !== false && $order['serial'] != '') {
+        $SN = $this->db->query("SELECT CONCAT(`key`, '', `featurecode`) as SN FROM " . DB_PREFIX . "serials_order WHERE `oid` = '" . $order['order_id'] . "' and `key` = '" . $order['serial'] . "'");
+        $this->load->model('catalog/serial');
+        $KC = $this->model_catalog_serial->generate_keycode($SN->row['SN']);
+
+    ?>
+
+      <a class="tooltip"><?php echo str_replace(",","<br />",$order['serial']); ?>
+        <span><img class="callout" src="view/image/callout.gif" /><strong><?php echo $SN->row['SN']; ?></strong> : <strong><?php echo $KC; ?></strong></span> 
+      </a>
+    <?php
+    }
   }
-?>
+  ?>
 
 </td>]]></add>
     </operation>
