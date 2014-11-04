@@ -143,7 +143,7 @@
                     ?>
 
                     </select>
-                    <?php if ($error_referral) { ?>
+                    <?php if (isset($error_referral)) { ?>
                     <span class="error"><?php echo $error_referral; ?></span>
                     <?php  } ?></td>
                 </tr>

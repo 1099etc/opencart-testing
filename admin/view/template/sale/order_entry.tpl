@@ -576,6 +576,17 @@
 				</div>
 			</div>
 
+<script>
+  $("#new_customer_form").submit(function() {
+    if($("#referral").val() == '' {
+      alert("Please check the referral box");
+      return false;
+    }
+  });
+
+</script>
+
+
 			<div id="new_customer_form" class="new_customer_form" style="display: none !important;">
 				<h2 id="new_customer_heading"><?php echo $text_new_customer; ?></h2>
 				<h2 id="guest_customer_heading" style="display: none !important;"><?php echo $text_guest_customer; ?></h2>
@@ -739,10 +750,11 @@
 <tr>
 <td>
                   <td><span class="required">*</span> Where did you hear about us?</td>
-                  <td><select name="referral">
+                  <td><select name="referral" id='referral'>
                     <?php
 
-                      $referrers = array( 'other' => 'Other',
+                      $referrers = array(
+                                          'other' => 'Other',
                                           'referral' => 'Referral from a friend / associate',
                                           'previous' => 'I have used the software before',
                                           'nelco' => 'Nelco',
