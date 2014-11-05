@@ -847,11 +847,6 @@ class ModelSaleOrder extends Model {
                 <?php } else { ?>
                 <a href="<?php echo $sort_total_orders; ?>"><?php echo $column_total_orders; ?></a>
                 <?php } ?></td>
-              <td class="left"><?php if ($sort == 'total_value') { ?>
-                <a href="<?php echo $sort_total_value; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_total_value; ?></a>
-                <?php } else { ?>
-                <a href="<?php echo $sort_total_value; ?>"><?php echo $column_total_value; ?></a>
-                <?php } ?></td> 
             ]]></add>
         </operation>
         <operation error="skip">
@@ -859,7 +854,6 @@ class ModelSaleOrder extends Model {
               <td><select name="filter_status">
             ]]></search>
             <add><![CDATA[
-              <td></td>
               <td></td>  
             ]]></add>
         </operation>        
@@ -877,7 +871,6 @@ class ModelSaleOrder extends Model {
             ]]></search>
             <add><![CDATA[
               <td class="left"><?php echo $customer['total_orders']; ?></td>
-              <td class="left"><?php echo $customer['total_value']; ?></td>   
             ]]></add>
         </operation>
         <operation error="skip">
