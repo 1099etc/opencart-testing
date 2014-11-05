@@ -47,11 +47,6 @@
                 <?php } else { ?>
                 <a href="<?php echo $sort_approved; ?>"><?php echo $column_approved; ?></a>
                 <?php } ?></td>
-              <td class="left"><?php if ($sort == 'c.ip') { ?>
-                <a href="<?php echo $sort_ip; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_ip; ?></a>
-                <?php } else { ?>
-                <a href="<?php echo $sort_ip; ?>"><?php echo $column_ip; ?></a>
-                <?php } ?></td>
               <td class="left"><?php if ($sort == 'c.date_added') { ?>
                 <a href="<?php echo $sort_date_added; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_date_added; ?></a>
                 <?php } else { ?>
@@ -102,7 +97,6 @@
                   <option value="0"><?php echo $text_no; ?></option>
                   <?php } ?>
                 </select></td>
-              <td><input type="text" name="filter_ip" value="<?php echo $filter_ip; ?>" /></td>
               <td><input type="text" name="filter_date_added" value="<?php echo $filter_date_added; ?>" size="12" id="date" /></td>
               <td></td>
               <td align="right"><a onclick="filter();" class="button"><?php echo $button_filter; ?></a></td>
@@ -120,7 +114,6 @@
               <td class="left"><?php echo $customer['customer_group']; ?></td>
               <td class="left"><?php echo $customer['status']; ?></td>
               <td class="left"><?php echo $customer['approved']; ?></td>
-              <td class="left"><?php echo $customer['ip']; ?></td>
               <td class="left"><?php echo date("d M Y", strtotime(str_replace("/","-",$customer['date_added']))); ?></td>
               <td class="left"><select onchange="((this.value !== '') ? window.open('index.php?route=sale/customer/login&token=<?php echo $token; ?>&customer_id=<?php echo $customer['customer_id']; ?>&store_id=' + this.value) : null); this.value = '';">
                   <option value=""><?php echo $text_select; ?></option>

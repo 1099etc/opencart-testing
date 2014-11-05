@@ -17,23 +17,31 @@
 		} else {
 			$filter_postcode = null;
 		}
+                 if (isset($this->request->get['filter_company'])) {
+			$filter_company = $this->request->get['filter_company'];
+		} else {
+			$filter_company = null;
+		}            
            ####]]></add>
 		</operation>
 		<operation >
 			<search position="before"><![CDATA['filter_customer_group_id' => $filter_customer_group_id,]]></search>
 			<add><![CDATA['filter_telephone'             => $filter_telephone,
-                                      'filter_postcode'             => $filter_postcode,]]></add>
+                                      'filter_postcode'             => $filter_postcode,
+                                      'filter_company'             => $filter_company,]]></add>
 		</operation>
             <operation >
 			<search position="before"><![CDATA['customer_group' => $result['customer_group'],]]></search>
 			<add><![CDATA['telephone'          =>  $result['telephone'],
-                                'postcode'          =>  $result['postcode'],]]></add>
+                                'postcode'          =>  $result['postcode'],
+                                'company'          =>  $result['company'],]]></add>
 		</operation>
               <operation >
 			<search position="before"><![CDATA[$this->data['column_customer_group'] = $this->language->get('column_customer_group');]]></search>
 			<add><![CDATA[ ###
                 $this->data['column_telephone'] = $this->language->get('column_telephone');
                 $this->data['column_postcode'] = $this->language->get('column_postcode');
+                $this->data['column_company'] = $this->language->get('column_company');            
                 ###]]></add>
 		</operation>
              <operation >
@@ -41,6 +49,7 @@
 			<add><![CDATA[  ###
                 $this->data['sort_telephone'] = $this->url->link('sale/customer', 'token=' . $this->session->data['token'] . '&sort=ca.phone' . $url, 'SSL');
                 $this->data['sort_postcode'] = $this->url->link('sale/customer', 'token=' . $this->session->data['token'] . '&sort=c.postcode' . $url, 'SSL');
+                            $this->data['sort_company'] = $this->url->link('sale/customer', 'token=' . $this->session->data['token'] . '&sort=c.company' . $url, 'SSL');
                 ###]]></add>
 		</operation>
              <operation >
@@ -48,6 +57,7 @@
 			<add><![CDATA[
                 $this->data['filter_telephone'] = $filter_telephone;
                 $this->data['filter_postcode'] = $filter_postcode;
+                $this->data['filter_company'] = $filter_company;            
                 ]]></add>
 		</operation>
             	
@@ -56,7 +66,8 @@
             <operation >
 			<search position="before"><![CDATA[$_['column_customer_group'] = 'Customer Group';]]></search>
 			<add><![CDATA[ $_['column_telephone']          = 'Telephone';
-                                       $_['column_postcode']          = 'Postcode';]]></add>
+                                       $_['column_postcode']          = 'Postcode';
+                                        $_['column_company']          = 'Company';]]></add>
 		</operation>
             
         </file>
@@ -66,23 +77,39 @@
 			<search position="before"><![CDATA[if (isset($data['filter_newsletter']) && !is_null($data['filter_newsletter'])) {]]></search>
 			<add><![CDATA[  ###
                 if (!empty($data['filter_telephone'])) {
+			#$implode[] = "c.telephone LIKE '%" . $this->db->escape($data['filter_telephone']) . "%'";
 			$implode[] = "replace(replace(replace(replace(replace(c.telephone,'.',''),')',''),'(',''),'-',''),' ', '') LIKE '%" . $this->db->escape(preg_replace('/\D/','',$data['filter_telephone'])) . "%'";
 		}
                 if (!empty($data['filter_postcode'])) {
 			$implode[] = "replace(replace(ca.postcode,' ',''),'-', '') LIKE '%" . $this->db->escape(preg_replace('/\D/','',$data['filter_postcode'])) . "%'";
 		}
+                            if (!empty($data['filter_company'])) {
+			$implode[] = "ca.company LIKE '%" . $this->db->escape($data['filter_company']) . "%'";
+                       # $implode[] = "replace(replace(ca.company,' ',''),'-', '') LIKE '%" . $this->db->escape(preg_replace('/\D/','',$data['filter_company'])) . "%'"   ; 
+                }
                 ###]]></add>
 		</operation>
               <operation >
 			<search position="before"><![CDATA['customer_group',]]></search>
 			<add><![CDATA[ 'c.telephone',
-                                       'ca.postcode',]]></add>
+                                       'ca.postcode',
+                                        'ca.company',]]></add>
 		</operation>
              
              
              <operation >
 			<search position="replace"><![CDATA[$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "customer";]]></search>
-			<add><![CDATA[$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "customer as c"." LEFT JOIN " . DB_PREFIX . "address as ca on c.customer_id=ca.customer_id ";]]></add>
+			<add><![CDATA[$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "customer as c"." LEFT JOIN  " . DB_PREFIX ."address as ca on c.customer_id=ca.customer_id ";]]></add>
+		</operation>
+                  <operation >
+			<search position="replace"><![CDATA[$implode[] = "CONCAT(c.firstname, ' ', c.lastname) LIKE '%" . $this->db->escape($data['filter_name']) . "%'";]]></search>
+			<add><![CDATA[$implode[] = "CONCAT(c.firstname, ' ', c.lastname) LIKE '%" . $this->db->escape($data['filter_name']) . "%'";]]></add>
+			
+		</operation>
+		 <operation >
+			<search position="replace"><![CDATA[$implode[] = "customer_id IN (SELECT customer_id FROM " . DB_PREFIX . "customer_ip WHERE ip = '" . $this->db->escape($data['filter_ip']) . "')";]]></search>
+			<add><![CDATA[$implode[] = "c.customer_id IN (SELECT cip.customer_id FROM " . DB_PREFIX . "customer_ip as cip WHERE ip = '" . $this->db->escape($data['filter_ip']) . "')";]]></add>
+			
 		</operation>
              
             
@@ -99,17 +126,24 @@
                 <a href="<?php echo $sort_postcode; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_postcode; ?></a>
                 <?php } else { ?>
                 <a href="<?php echo $sort_postcode; ?>"><?php echo $column_postcode; ?></a>
+                <?php } ?></td>
+ <td class="left"><?php if ($sort == 'c.company') { ?>
+                <a href="<?php echo $sort_company; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_company; ?></a>
+                <?php } else { ?>
+                <a href="<?php echo $sort_company; ?>"><?php echo $column_company; ?></a>
                 <?php } ?></td>]]></add>
 		</operation>
                <operation >
 			<search position="before"><![CDATA[<td><select name="filter_customer_group_id">]]></search>
-			<add><![CDATA[ <td><input type="text" name="filter_telephone" value="<?php echo $filter_telephone; ?>" /></td>
-                                       <td><input type="text" name="filter_postcode" value="<?php echo $filter_postcode; ?>" /></td>]]></add>
+			<add><![CDATA[ <td><input type="text" size="7" name="filter_telephone" value="<?php echo $filter_telephone; ?>" /></td>
+                                       <td><input type="text" size="7" name="filter_postcode" value="<?php echo $filter_postcode; ?>" /></td>
+                                        <td><input type="text" size="10" name="filter_company" value="<?php echo $filter_company; ?>" /></td>]]></add>
 		</operation>
               <operation >
 			<search position="before"><![CDATA[<td class="left"><?php echo $customer['customer_group']; ?></td>]]></search>
 			<add><![CDATA[<td class="left"><?php echo $customer['telephone']; ?></td>
-                                      <td class="left"><?php echo $customer['postcode']; ?></td>]]></add>
+                                      <td class="left"><?php echo $customer['postcode']; ?></td>
+                                      <td class="left"><?php echo $customer['company']; ?></td>]]></add>
 		</operation>            
             <operation >
 			<search position="before"><![CDATA[var filter_customer_group_id = $('select[name=\'filter_customer_group_id\']').attr('value');]]></search>
@@ -123,7 +157,13 @@
 	
 	if (filter_postcode) {
 		url += '&filter_postcode=' + encodeURIComponent(filter_postcode);
-	}]]></add>
+	}
+  var filter_company = $('input[name=\'filter_company\']').attr('value');
+	
+	if (filter_company) {
+		url += '&filter_company=' + encodeURIComponent(filter_company);
+	}
+]]></add>
 		</operation>
             	
         </file>
@@ -159,11 +199,11 @@
         <file name="admin/view/template/sale/order_list.tpl">
             <operation >
 			<search position="after"><![CDATA[<a href="<?php echo $sort_customer; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_customer; ?></a>]]></search>
-			<add><![CDATA[<span style="float:right"> <b>Postcode</b> <input type="text" name="filter_postcode" value="<?php echo $filter_postcode; ?>" /></span>]]></add>
+			<add><![CDATA[<span style="float:right"> <b>Postcode</b> <input type="text" name="filter_postcode" value="<?php echo $filter_postcode; ?>" />    <a onclick="filter();" class="button"><?php echo $button_filter; ?></a></span>]]></add>
 		</operation>
             <operation >
 			<search position="after"><![CDATA[<a href="<?php echo $sort_customer; ?>"><?php echo $column_customer; ?></a>]]></search>
-			<add><![CDATA[<span style="float:right"> <b>Postcode</b> <input type="text" name="filter_postcode" value="<?php echo $filter_postcode; ?>" /></span>]]></add>
+			<add><![CDATA[<span style="float:right"> <b>Postcode</b> <input type="text" name="filter_postcode" value="<?php echo $filter_postcode; ?>" />    <a onclick="filter();" class="button"><?php echo $button_filter; ?></a></span>]]></add>
 		</operation>
              <operation >
 			<search position="before"><![CDATA[var filter_customer = $('input[name=\'filter_customer\']').attr('value');]]></search>
