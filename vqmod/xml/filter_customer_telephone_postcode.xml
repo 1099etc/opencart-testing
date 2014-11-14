@@ -137,7 +137,7 @@
 			<search position="before"><![CDATA[<td><select name="filter_customer_group_id">]]></search>
 			<add><![CDATA[ <td><input type="text" size="7" name="filter_telephone" value="<?php echo $filter_telephone; ?>" /></td>
                                        <td><input type="text" size="7" name="filter_postcode" value="<?php echo $filter_postcode; ?>" /></td>
-                                        <td><input type="text" size="10" name="filter_company" value="<?php echo $filter_company; ?>" /></td>]]></add>
+                                        <td><input type="text" size="20" name="filter_company" value="<?php echo $filter_company; ?>" /></td>]]></add>
 		</operation>
               <operation >
 			<search position="before"><![CDATA[<td class="left"><?php echo $customer['customer_group']; ?></td>]]></search>
@@ -199,10 +199,6 @@
         <file name="admin/view/template/sale/order_list.tpl">
             <operation >
 			<search position="after"><![CDATA[<a href="<?php echo $sort_customer; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_customer; ?></a>]]></search>
-			<add><![CDATA[<span style="float:right"> <b>Postcode</b> <input type="text" name="filter_postcode" value="<?php echo $filter_postcode; ?>" />    <a onclick="filter();" class="button"><?php echo $button_filter; ?></a></span>]]></add>
-		</operation>
-            <operation >
-			<search position="after"><![CDATA[<a href="<?php echo $sort_customer; ?>"><?php echo $column_customer; ?></a>]]></search>
 			<add><![CDATA[<span style="float:right"> <b>Postcode</b> <input type="text" name="filter_postcode" value="<?php echo $filter_postcode; ?>" />    <a onclick="filter();" class="button"><?php echo $button_filter; ?></a></span>]]></add>
 		</operation>
              <operation >

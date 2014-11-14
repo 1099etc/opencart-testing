@@ -969,6 +969,22 @@
 			</div>
 			
 			<div id="product_info" style="display: none !important;">
+
+        <div id='previous_orders' style='margin: 7px; margin-top: -2px; padding: 5px; border: 1px solid #d3d3d3'>
+          <a id='previous_orders_button' style='font-weight: bold;'>Click To View Previous Orders</a>
+          <div id='previous_orders_screen' class='previous_orders_screen' style='clear: both; overflow-y: show; overflow-x: auto;text-align: left;'>
+          </div>
+          <script>
+            $('#previous_orders_button').click(function() {
+              $('#previous_orders_screen').height('200px');
+              $('#previous_orders_button').hide();
+
+              $('#previous_orders_screen').load('index.php?route=sale/customer/update&token=<?php echo $_REQUEST["token"]; ?>&customer_id=' + $('#customer_id').val() + ' #tab_customer_history table');
+
+            });
+          </script>
+        </div>
+
 				<form id="products_form" name="products_form" action="<?php echo $action; ?>" method="POST" enctype="multipart/form-data">
 					<input type="hidden" id="products_count" name="products_count" value="0" />
 					<input type="hidden" id="require_shipping" name="require_shipping" value="0" />

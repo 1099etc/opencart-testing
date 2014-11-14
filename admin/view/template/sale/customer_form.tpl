@@ -1,5 +1,12 @@
 <?php echo $header; ?>
 
+<style>
+
+input[type='text'] { width: 100%; }
+
+
+</style>
+
 <?php // Added By John - alerts ?>
 <?php
   if(isset($alerts)) {
