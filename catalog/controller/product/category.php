@@ -236,7 +236,7 @@ class ControllerProductCategory extends Controller {
 				}
 
         if($result['meta_description']) {
-          $D = utf8_substr(strip_tags(html_entity_decode($result['meta_description'], ENT_QUOTES, 'UTF-8')), 0, 1000) . ' ';
+          $D = utf8_substr(html_entity_decode($result['meta_description'], ENT_QUOTES, 'UTF-8'), 0, 1000) . ' ';
           if(strlen($D) >= 1000) { $D = substr($D, 0, strpos($D, ' ', (strlen($D) - 15))); }
         } else {
           $D = utf8_substr(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8')), 0, 500) . ' ';
