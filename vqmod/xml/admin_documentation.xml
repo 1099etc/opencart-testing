@@ -1,0 +1,21 @@
+<modification>
+	<id>AMS Customizations</id>
+	<version>1.5.x</version>
+	<vqmver>2.X</vqmver>
+	<author>Advanced Micro Solutions - John LeVan</author>
+
+    
+  <!-- Modification of the Order List to turn Customer Name into a link to the customer account. -->
+  <file name="admin/view/template/common/header.tpl">
+    <!-- Also had to modify jg_serial_15X.xml to include 'o.customer_id' in the query. Fixing the query here was causing issues. -->
+
+    <operation>
+      <search position="before"><![CDATA[<li><a href="http://www.opencart.com" target="_blank"><?php echo $text_opencart; ?></a></li>]]></search>
+      <add><![CDATA[<li><a href="https://shop.1099-etc.com/docs/pmwiki.php" target="_blank">AMS Opencart Docs</a></li>]]></add>
+    </operation>
+
+  </file>
+
+
+
+</modification>

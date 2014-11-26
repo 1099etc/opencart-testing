@@ -72,9 +72,7 @@
                 <?php } ?></td>
 <!--
               <td class="left"><?php if ($sort == 'o.payment_method') { ?>
-                <a href="<?php echo $sort_payment_method; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_payment_method; ?></a>
                 <?php } else { ?>
-                <a href="<?php echo $sort_payment_method; ?>"><?php echo $column_payment_method; ?></a>
                 <?php } ?></td>
     -->                                                                          
 
@@ -130,9 +128,6 @@
 
 <!--              <td><select name="filter_payment_method">
                  <option value=""></option>
-                 <?php foreach($payment_methods as $method) { ?>
-                   <option value="<?php echo $method['payment_method']; ?>"><?php echo $method['payment_method']; ?></option>
-                 <?php } ?>
                  </select>
                </td>
     -->                                                                                                                              

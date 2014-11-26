@@ -33,6 +33,22 @@
     
 */
 
+// We need to determine if this order is a pre-order or not. If the order has a status of pre-order then we need to update it to complete.
+foreach($orders as $order) {
+  $q = $this->db->query("select `" . DB_PREFIX . "order`.order_status_id from `" . DB_PREFIX . "order` where `" . DB_PREFIX . "order`.order_id = '" . $order['order_id'] . "'");
+  $status = $q->rows[0]['order_status_id'];
+  if($status == '24') {
+     $this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '5', date_modified = NOW() WHERE order_id = '" . (int)$order['order_id'] . "'");
+  }
+ 
+}
+
+/*
+echo "<pre>";
+echo print_r($orders, true);
+echo "</pre>";
+exit;
+*/
 
 // Determine whether or not we want invoice or shipping labels.
 ((isset($_REQUEST['shippinglabels'])) && $_REQUEST['shippinglabels'] == 'ship') ? $label = 'ship' : $label = 'invoice';

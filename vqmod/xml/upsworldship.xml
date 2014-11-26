@@ -14,6 +14,7 @@
 				$this->data['text_nelcoweekly']   = $this->language->get('text_nelcoweekly');
 				$this->data['text_sale_ok_tax']   = $this->language->get('text_sale_ok_tax');
 				$this->data['text_reorder']       = $this->language->get('text_reorder');
+				$this->data['text_new_customer']       = $this->language->get('text_new_customer');
 				$this->data['text_unpaidInvoice'] = $this->language->get('text_unpaidInvoice');
 			]]></add>
 		</operation>
@@ -26,6 +27,7 @@
 				$this->data['nelcoweekly']   = $this->url->link('report/nelcoweekly', 'token=' . $this->session->data["token"], 'SSL'); 
 				$this->data['sale_ok_tax']   = $this->url->link('report/sale_ok_tax', 'token=' . $this->session->data["token"], 'SSL'); 
 				$this->data['reorder']       = $this->url->link('report/reorder', 'token=' . $this->session->data["token"], 'SSL'); 
+				$this->data['new_customer']       = $this->url->link('report/new_customer', 'token=' . $this->session->data["token"], 'SSL'); 
 				$this->data['unpaidInvoice'] = $this->url->link('report/unpaidInvoice', 'token=' . $this->session->data["token"], 'SSL'); 
 			]]></add>
 		</operation>
@@ -41,6 +43,7 @@
 				$_['text_nelcoweekly']   = 'Nelco Weekly';
 				$_['text_sale_ok_tax']   = 'OK Sales Tax';
 				$_['text_reorder']       = 'Reorder Report';
+				$_['text_new_customer']       = 'Customer Totals';
 				$_['text_unpaidInvoice'] = 'Unpaid Invoices';
 			]]></add>
 		</operation>
@@ -54,6 +57,7 @@
 				<li><a href="<?php echo $upsworldship; ?>"><?php echo $text_upsworldship; ?></a></li>
 				<li><a href="<?php echo $sale_ok_tax; ?>"><?php echo $text_sale_ok_tax; ?></a></li>
 				<li><a href="<?php echo $reorder; ?>"><?php echo $text_reorder; ?></a></li>
+				<li><a href="<?php echo $new_customer; ?>"><?php echo $text_new_customer; ?></a></li>
 				<li><a href="<?php echo $unpaidInvoice; ?>"><?php echo $text_unpaidInvoice; ?></a></li>
 			]]></add>
 		</operation>

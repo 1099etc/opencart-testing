@@ -213,7 +213,20 @@ class ModelCheckoutOrder extends Model {
 $X_order_id = $order_product['order_id'];
 $X_order_product_id = $order_product['order_product_id'];
 $X_product_model = $order_product['model'];
+$stockStatusID = $this->db->query("select " . DB_PREFIX . "product.stock_status_id from " . DB_PREFIX . "product, " . DB_PREFIX . "order_product where " . DB_PREFIX . "order_product.product_id = " . DB_PREFIX . "product.product_id and " . DB_PREFIX . "order_product.order_id = '" . $X_order_id . "'");
+foreach($stockStatusID->rows as $ssID) {
+  // Check if the item is preordered
+  if($ssID['stock_status_id'] == 8) {
+    // Here, we need to check to see if it's already been paid, or if it's a check order
+    if($order_status_id == '5') {
+      $this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '24', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+    }
+    else {
+      $this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '25', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+    }
 
+  }
+}
 
 				$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
 				
@@ -458,10 +471,20 @@ $Q = "SELECT featurecodeOrder, featurecode FROM `" . DB_PREFIX . "option`, `" . 
 			
 			// Products
 			$template->data['products'] = array();
-				
+		  $preorder_message = false;		
 			foreach ($order_product_query->rows as $product) {
 				$option_data = array();
-				
+				if(!$preorder_message)
+        {
+          $product_status_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product['product_id'] . "'");
+
+          if(strpos($product['model'],'1099-FormsFiler') && $product_status_query->row['stock_status_id'] == 8)
+          {
+            $preorder_message = true;
+            $template->data['comment'] .= "<br>You have ordered the ".$product['name'].", which will be released by early January.  You will receive an email notification when the software is available.";
+          }
+        }
+
 				$order_option_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$product['order_product_id'] . "'");
 				
 				foreach ($order_option_query->rows as $option) {
@@ -716,6 +739,22 @@ $Q = "SELECT featurecodeOrder, featurecode FROM `" . DB_PREFIX . "option`, `" . 
 						
 			$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 		
+      // Added by John
+      $stockStatusID = $this->db->query("select " . DB_PREFIX . "product.stock_status_id from " . DB_PREFIX . "product, " . DB_PREFIX . "order_product where " . DB_PREFIX . "order_product.product_id = " . DB_PREFIX . "product.product_id and " . DB_PREFIX . "order_product.order_id = '" . $order_id . "'");
+      foreach($stockStatusID->rows as $ssID) {
+        // Check if the item is preordered
+        if($ssID['stock_status_id'] == 8) {
+          // Here, we need to check to see if it's already been paid, or if it's a check order
+            if($order_status_id == '5') {
+              $this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '24', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+            }
+            else {
+              $this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '25', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+            }
+          }
+        }
+
+
 			$this->db->query("INSERT INTO " . DB_PREFIX . "order_history SET order_id = '" . (int)$order_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape($comment) . "', date_added = NOW()");
 
       $AlertMessage = $comment;	
@@ -743,10 +782,22 @@ $message = "<div style='width:590px;'>";
 //$message .= "<a href='$store_url' title='$store_name'><img src='$logo' alt='$store_name' style='margin-bottom: 20px; border: none;' /></a>";
 
         $order_product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
-
+        $preorder_message = false;
+        $preorder_comment = '';
         foreach ($order_product_query->rows as $product) {
           $option_data = array();
+          
+          if(!$preorder_message)
+          {
+            $product_status_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product['product_id'] . "'");
 
+            if(strpos($product['model'],'1099-FormsFiler') && $product_status_query->row['stock_status_id'] == 8)
+            {
+              $preorder_message = true;
+              $preorder_comment = "<br>You have ordered the ".$product['name'].", which will be released by early January.  You will receive an email notification when the software is available.";            
+            }
+          }
+                                                                          
           $serials = array();
           if($order_status_id == $this->config->get('config_complete_status_id')) {
             $sns          = $this->model_catalog_serial->getSerialsByProduct($product['order_product_id']);
@@ -921,10 +972,10 @@ $message = "<div style='width:590px;'>";
           $message .= "<tr>\n";
           $message .= "<td style='font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;'>\n";
 //          $message .= $language->get('text_update_link') . "\n";
-          $message .= $order_info['store_url'] . 'index.php?route=account/order/info&order_id=' . $order_id . "<br />";
+          $message .= "<a href='" . $order_info['store_url'] . 'index.php?route=account/order/info&order_id=' . $order_id . "'>" . $order_info['store_url'] . 'index.php?route=account/order/info&order_id=' . $order_id . "</a><br />";
           $message .= "</td></tr></tbody></table>\n";
         }
- if ($comment && strpos($comment,"Authorization Code") === false) {
+ if (($comment && strpos($comment,"Authorization Code") === false) || $preorder_comment) {
           $message .= "<table style='border-collapse: collapse; width: 100%; border-top: 1px solid #DDDDDD; border-left: 1px solid #DDDDDD; margin-bottom: 20px;'>\n";
           $message .= "<thead>\n";
           $message .= "<tr>\n";
@@ -935,7 +986,12 @@ $message = "<div style='width:590px;'>";
           $message .= "<tr>\n";
           $message .= "<td style='font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;'>\n";
 //          $message .= $language->get('text_update_comment') . "\n\n";
-          $message .= nl2br($comment) . "<br />";
+          if ($comment && strpos($comment,"Authorization Code") === false) {
+            $message .= nl2br($comment) . "<br />";
+          }
+          if ($preorder_comment) {
+            $message .= $preorder_comment . "<br>";
+          }
           $message .= "</td></tr></tbody></table>\n";
         }
         $message .= "</div>";

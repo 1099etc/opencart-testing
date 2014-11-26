@@ -1,52 +1,38 @@
 <?php 
+// This is the AMS Update Controller Module, written by John LeVan for Advanced Micro Solutions.
 
 class ControllerAccountAmsupdate extends Controller { 
+
+  // Set our serial number variable.
+  protected $serial;
+
+  // Our index function.
 	public function index() {
+    // Essentially, we need to check for a serial number, and make sure that if it exists, 
+    // it's in uppercase, and then load our page.
+
+    // First, check the get variable, the overwrite it with post
     if(isset($this->request->get['serial'])) {
-      $serial = $this->request->get['serial'];
+      $this->serial = $this->request->get['serial'];
     }
     if(isset($this->request->post['serial'])) {
-      $serial = $this->request->get['serial'];
+      $this->serial = $this->request->post['serial'];
     }
     else {
-      $serial = '';
+      $this->serial = '';
     }
+    $this->serial = strtoupper($this->serial);
 
-    $this->data['serial'] = strtoupper($serial); 
-
+    // Set the page Title, show the page.
     $this->document->setTitle('AMS Software Updates');
     $this->showPage();
 
 	}
 
+  // This function is to send out the data to the template and display the page.
   public function showPage($errors = '', $files = array(), $serial = '') {
-    if(isset($this->request->get['serial'])) {
-      $serial = $this->request->get['serial'];
-    }
-    if(isset($this->request->post['serial'])) {
-      $serial = $this->request->get['serial'];
-    }
-    else {
-      $serial = '';
-    }
-
-    if(isset($this->request->get['serialSearch'])) {
-      $serial = $this->request->get['serialSearch'];
-    }
-    if(isset($this->request->post['serialSearch'])) {
-      $serial = $this->request->get['serialSearch'];
-    }
-    else {
-      $serial = '';
-    }
-
-
-    $this->data['serial'] = strtoupper($serial);
-
-    $this->load->model('account/amsupdate');
-
-//$errors = 'hello world';
-
+    // Pass in some data to the template, then load the template
+    $this->data['serial'] = strtoupper($this->serial);
     $this->data['heading_title'] = 'Software Download';
     $this->data['errors'] = $errors;
     $this->data['files'] = $files;
@@ -70,52 +56,25 @@ class ControllerAccountAmsupdate extends Controller {
   }
 
   public function submit() {
-    if(isset($this->request->get['serial'])) {
-      $serial = $this->request->get['serial'];
-    }
-    if(isset($this->request->post['serial'])) {
-      $serial = $this->request->get['serial'];
-    }
-    else {
-      $serial = '';
-    }
-
-    if(isset($this->request->get['serialSearch'])) {
-      $serial = $this->request->get['serialSearch'];
-    }
-    if(isset($this->request->post['serialSearch'])) {
-      $serial = $this->request->get['serialSearch'];
-    }
-    else {
-      $serial = '';
-    }
-
-
-    $this->data['serial'] = strtoupper($serial);
-
-
-
+    $this->data['serial'] = $this->serial;
 
     $files = array();
 
     isset($this->request->get['serialSearch']) ? $serialSearch = strtoupper($this->request->get['serialSearch']) : $serialSearch = '';
     $errors = '';
 
-// Need to add a few more checks here.
+    // Need to add a few more checks here.
+    // First, check validity of the serial number or if it's empty.
     if(isset($serialSearch) && ($serialSearch != 'demo' && $serialSearch != 'Demo')) {
       $this->load->model('catalog/serial');
       $validSerials = trim($this->model_catalog_serial->validSerialNOJSON($serialSearch));
       if($validSerials != 'true') {
         $errors = '<li>' . $validSerials . '</li>';
       }
-      else {
-        $errors = '';
-      }
     }
     elseif(!isset($serialSearch) || $serialSearch == '') {
       $errors = '<li>Error: ND4 - The serial number was empty. Please submit a valid serial number.</li>';
     }
-    
 
     if(isset($serialSearch) && ($serialSearch != 'demo' && $serialSearch != 'Demo')) {
       $featurecodes = substr($this->request->get['serialSearch'],-3,3);
@@ -125,8 +84,17 @@ class ControllerAccountAmsupdate extends Controller {
 
       $status_id = $this->model_account_amsupdate->getSerialOrderStatusID($serialcode);
       if($status_id != '5') { // If the serial is not on a "complete" order....
-        $errors .= '<li>Error: ND8 - The serial you submitted is unavailable.</li>';
-        $this->showPage($errors, '', $serial);
+        // Need to add a message for preordered files based on stock status.
+        $stock_status = $this->model_account_amsupdate->getSerialProductStock($serialcode);
+        $model = $this->model_account_amsupdate->getSerialProductModel($serialcode);
+        if(strpos($model, '-1099-FormsFiler') !== false && $stock_status == 8) {
+          $SWyear = substr($model, 0, 4);
+          $errors .= '<li>Notice: You have pre-ordered the ' . $SWyear . ' software, which will be released by early January. You will receive an email notification when the software is available.</li>';
+        }
+        else {
+          $errors .= '<li>Error: ND8 - The serial you submitted is unavailable.</li>';
+        }
+        $this->showPage($errors, '', $this->serial);
       }
       else {
         $featurecodes = strtoupper($featurecodes);
@@ -149,7 +117,17 @@ class ControllerAccountAmsupdate extends Controller {
         }
         else { 
           if($serialSearch != '') {
-            $errors .= '<li>Error: ND1 - The serial you submitted does not have any downloads available.</li>';
+            // Need to add a message for preordered files based on stock status.
+            $stock_status = $this->model_account_amsupdate->getSerialProductStock($serialcode);
+            $model = $this->model_account_amsupdate->getSerialProductModel($serialcode);
+
+            if(strpos($model, '-1099-FormsFiler') !== false && $stock_status == 8) {
+              $SWyear = substr($model, 0, 4);
+              $errors .= '<li>Notice: You have pre-ordered the ' . $SWyear . ' software, which will be released by early January. You will receive an email notification when the software is available.</li>';
+            }
+            else {
+              $errors .= '<li>Error: ND1 - The serial you submitted does not have any downloads available.</li>';
+            }
           }
         }
       } // If serialSearch != Demo
@@ -180,19 +158,18 @@ class ControllerAccountAmsupdate extends Controller {
     }
 // Need to check the database for the serial and display the files associated with the product that was purchased.
 
-    $this->showPage($errors,$files, $serial);
+    $this->showPage($errors,$files, $this->serial);
   }
 
 
-  public function download($download_id = '', $serial = '') {  
+  public function download($download_id = '', $s = '') {  
     isset($this->request->get['download_id']) ? $download_id = $this->request->get['download_id'] : $download_id = '';
-    isset($this->request->get['serial']) ? $serial = $this->request->get['serial'] : $serial = '';
 
-    if(($serial != '' && $download_id != '') || $download_id == 12 || $download_id != '') {
-      if($download_id == 12 && $serial == '') { $serial = 'demo'; }
+    if(($this->serial != '' && $download_id != '') || $download_id == 12 || $download_id != '') {
+      if($download_id == 12 && $this->serial == '') { $this->serial = 'demo'; }
 
-      if($serial == '') {
-        $serialcode = substr($serial, 0, 5);
+      if($this->serial != '') {
+        $serialcode = substr($this->serial, 0, 5);
       }
       else { $serialcode = ''; }
 
@@ -201,8 +178,6 @@ class ControllerAccountAmsupdate extends Controller {
       $filename = $downloadInfo['filename'];
       $mask     = $downloadInfo['mask'];
       $link = '<a href="https://shop.1099-etc.com/download/' . $filename . '">Download</a>';
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
       $file = 'download/' . $filename;
       $mask = basename($mask);
 
@@ -256,9 +231,7 @@ class ControllerAccountAmsupdate extends Controller {
           header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
           header('Pragma: public');
           header('Content-Length: ' . filesize($file));
-
           if (ob_get_level()) ob_end_clean();
-
           readfile($file, 'rb');
           exit;
         } else {
@@ -267,7 +240,6 @@ class ControllerAccountAmsupdate extends Controller {
       } else {
         exit('Error: Headers already sent out!');
       }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
     else {
       $this->showPage('There was a problem obtaining the download you requested. Please try again.'); 

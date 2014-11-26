@@ -9,11 +9,8 @@ class ModelAccountAmsupdate extends Model {
     $query .= "AND " . DB_PREFIX . "order_product.product_id = " . DB_PREFIX . "product_to_download.product_id ";
     $query .= "AND " . DB_PREFIX . "order_product.order_id = " . DB_PREFIX . "serials_order.oid ";
     $query .= "AND " . DB_PREFIX . "serials_order.`key` = '" . $this->db->escape($serial) . "'";
-
     $query .= "AND " . DB_PREFIX . "serials_order.`featurecode` = '" . $this->db->escape($featurecodes) . "'";
-    
     $query .= "AND " . DB_PREFIX . "download.download_id = " . DB_PREFIX . "download_description.download_id";
-
 
     $downloads = $this->db->query($query);
 
@@ -37,8 +34,9 @@ class ModelAccountAmsupdate extends Model {
     return $files;
   }
 
+  // returns the file based on specific download id
   public function getDownload($download_id) {
-    $download = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "download WHERE download_id='" . $download_id ."' LIMIT 1");
+    $download = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "download WHERE download_id='" . $this->db->escape($download_id) ."' LIMIT 1");
     if($download->num_rows) {
      foreach($download->rows as $dl) {
        return array( 'filename' => $dl['filename'], 'mask' => $dl['mask'] );
@@ -49,8 +47,9 @@ class ModelAccountAmsupdate extends Model {
     }
   }
 
+  // Quick function to return the order status id
   public function getSerialOrderStatusID($serial) {
-    $q = $this->db->query("select `" . DB_PREFIX . "order`.order_status_id from  `" . DB_PREFIX . "order`, " . DB_PREFIX . "serials_order where " . DB_PREFIX . "serials_order.oid = `" . DB_PREFIX . "order`.order_id and " . DB_PREFIX . "serials_order.`key`='" . $serial . "'");
+    $q = $this->db->query("select `" . DB_PREFIX . "order`.order_status_id from  `" . DB_PREFIX . "order`, " . DB_PREFIX . "serials_order where " . DB_PREFIX . "serials_order.oid = `" . DB_PREFIX . "order`.order_id and " . DB_PREFIX . "serials_order.`key`='" . $this->db->escape($serial) . "'");
     if($q->num_rows) {
       foreach($q->rows as $soid) {
         return $soid['order_status_id'];
@@ -58,6 +57,30 @@ class ModelAccountAmsupdate extends Model {
     }
     return false;
   }
+
+  // Quick function to return the product stock status
+  public function getSerialProductStock($serial) {
+    $q = $this->db->query("select " . DB_PREFIX . "product.stock_status_id from  " . DB_PREFIX . "`order`, " . DB_PREFIX . "order_product, " . DB_PREFIX . "serials_order, " . DB_PREFIX . "product where " . DB_PREFIX . "serials_order.oid = `" . DB_PREFIX . "order`.order_id and " . DB_PREFIX . "`order_product`.order_id  =  `" . DB_PREFIX . "order`.order_id and " . DB_PREFIX . "product.product_id = `" . DB_PREFIX . "order_product`.product_id and " . DB_PREFIX . "serials_order.`key`= '" . $this->db->escape($serial) . "' ORDER BY `" . DB_PREFIX . "order`.date_added DESC");
+
+    if($q->num_rows) {
+      foreach($q->rows as $X) {
+        return $X['stock_status_id'];
+      }
+    }
+    return false;
+  }
+
+  // Quick function to return the product model
+  public function getSerialProductModel($serial) {
+    $q = $this->db->query("select " . DB_PREFIX . "product.model from  " . DB_PREFIX . "`order`, " . DB_PREFIX . "order_product, " . DB_PREFIX . "serials_order, " . DB_PREFIX . "product where " . DB_PREFIX . "serials_order.oid = `" . DB_PREFIX . "order`.order_id and " . DB_PREFIX . "`order_product`.order_id  =  `" . DB_PREFIX . "order`.order_id and " . DB_PREFIX . "product.product_id = `" . DB_PREFIX . "order_product`.product_id and " . DB_PREFIX . "serials_order.`key`= '" . $this->db->escape($serial) . "' ORDER BY `" . DB_PREFIX . "order`.date_added DESC");
+    if($q->num_rows) {
+      foreach($q->rows as $X) {
+        return $X['model'];
+      }
+    }
+    return false;
+  }
+
 
 }
 ?>

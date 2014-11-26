@@ -918,7 +918,7 @@ class ModelSaleOrder extends Model {
 
     // Products
     $template->data['products'] = array();
-
+    $preorder_message = false;
     foreach ($order_product_query->rows as $product) {
       $option_data = array();
 
@@ -958,7 +958,16 @@ class ModelSaleOrder extends Model {
           'serials' => $serials
         );
       }
+      if(!$preorder_message)
+      {
+        $product_status_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product['product_id'] . "'");
 
+        if(strpos($product['model'],'1099-FormsFiler') && $product_status_query->row['stock_status_id'] == 8)
+        {
+          $preorder_message = true;
+          $template->data['comment'] .= "<br>You have ordered the ".$product['name'].", which will be released by early January.  You will receive an email notification when the software is available.";
+        }
+      }
       $template->data['products'][] = array(
         'name'     => $product['name'],
         'model'    => $product['model'],

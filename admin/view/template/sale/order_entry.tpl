@@ -578,7 +578,7 @@
 
 <script>
   $("#new_customer_form").submit(function() {
-    if($("#referral").val() == '' {
+    if($("#referral").val() == '') {
       alert("Please check the referral box");
       return false;
     }
@@ -974,15 +974,6 @@
           <a id='previous_orders_button' style='font-weight: bold;'>Click To View Previous Orders</a>
           <div id='previous_orders_screen' class='previous_orders_screen' style='clear: both; overflow-y: show; overflow-x: auto;text-align: left;'>
           </div>
-          <script>
-            $('#previous_orders_button').click(function() {
-              $('#previous_orders_screen').height('200px');
-              $('#previous_orders_button').hide();
-
-              $('#previous_orders_screen').load('index.php?route=sale/customer/update&token=<?php echo $_REQUEST["token"]; ?>&customer_id=' + $('#customer_id').val() + ' #tab_customer_history table');
-
-            });
-          </script>
         </div>
 
 				<form id="products_form" name="products_form" action="<?php echo $action; ?>" method="POST" enctype="multipart/form-data">
@@ -1268,6 +1259,17 @@
 <script type="text/javascript"><!--
 
 	$(document).ready(function() {
+
+    $('#previous_orders_button').on('click', function() {
+      $('#previous_orders_screen').height('200px');
+      $('#previous_orders_button').hide();
+      $('#previous_orders_screen').load('index.php?route=sale/customer/update&token=<?php echo $_REQUEST["token"]; ?>&customer_id=' + $('#customer_id').val() + ' #tab_customer_history table');
+/*      $.get('index.php?route=sale/customer/update&token=<?php echo $_REQUEST["token"]; ?>&customer_id=' + $('#customer_id').val(), function(data) {
+        $('#previous_orders_screen').append('done!');
+      });
+*/
+
+    });
 	
 		var requestRunning = false;
 

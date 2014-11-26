@@ -278,7 +278,7 @@ public function resend(){
     $template->data['order_id'] = $order_id;
     $template->data['date_added'] = date($language->get('date_format_short'), strtotime($order_info['date_added']));      
     $template->data['payment_method'] = $order_info['payment_method'];
-    $template->data['shipping_method'] = $order_info['shipping_method']."<br>".$order_info['shipping_description'];
+    $template->data['shipping_method'] = $order_info['shipping_method']."<br>".html_entity_decode($order_info['shipping_description']);
     $template->data['email'] = $order_info['email'];
     $template->data['telephone'] = $order_info['telephone'];
     $template->data['ip'] = $order_info['ip'];
@@ -372,7 +372,7 @@ public function resend(){
       
     // Products
     $template->data['products'] = array();
-      
+    $preorder_message = false;  
     foreach ($order_product_query->rows as $product) {
       $option_data = array();
       
@@ -410,6 +410,17 @@ public function resend(){
         'price'    => $this->currency->format($product['price'] + ($this->config->get('config_tax') ? $product['tax'] : 0), $order_info['currency_code'], $order_info['currency_value']),
         'total'    => $this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value'])
       );
+      if(!$preorder_message)
+      {
+        $product_status_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product['product_id'] . "'");
+  
+        if(strpos($product['model'],'1099-FormsFiler') && $product_status_query->row['stock_status_id'] == 8)
+        {
+          $preorder_message = true;
+          $template->data['comment'] .= "<br>You have ordered the ".$product['name'].", which will be released by early January.  You will receive an email notification when the software is available.";
+        }
+      }
+
     }
     $template->data['totals'] = $order_total_query->rows;
     foreach ($template->data['totals'] as $key=>$total) {

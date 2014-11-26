@@ -5660,7 +5660,20 @@ $message = sprintf($this->language->get('text_order_success'), $order_id);
 				$product_data = array();
 				$products = $this->model_sale_order->getOrderProducts($order_id);
 				$this->load->model('tool/image');
+        $preorder_message = false;
 				foreach ($products as $product) {
+          if(!$preorder_message)
+          {
+            $product_status_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product['product_id'] . "'");
+
+            if(strpos($product['model'],'1099-FormsFiler') && $product_status_query->row['stock_status_id'] == 8)
+            {
+              $preorder_message = true;
+              $template->data['text_latest_comment'] = $language->get('text_latest_comment');
+              $template->data['latest_comment'] .= "<br>You have ordered the ".$product['name'].", which will be released by early January.  You will receive an email notification when the software is available.";
+            }
+          }
+
 					$option_data = array();
 					$options = $this->model_sale_order->getOrderOptions($order_id, $product['order_product_id']);
 					foreach ($options as $option) {
