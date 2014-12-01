@@ -57,7 +57,7 @@
 
   <div id='laserGenerationBlock' style='display: block; border: 1px solid lightgrey; padding: 10px; margin: 10px; width:auto;'>
     <input type='checkbox' name='selectLaser' id='selectLaser' value='1' />
-    <label for='selectLaser' style='font-weight: bold;'>Software Generated Forms</label>
+    <label for='selectLaser' style='font-weight: bold;'>Software Generated Forms <span style='color: red; font-weight: normal;'>(formerly Laser Generation Option)</label>
     <div class='priceTag' style='font-weight: bold; font-size: 16px; display: inline-block; float:right; text-align: right;'>+ $75.00</div>
     <div class='descriptiveText' style='padding-top: 10px;'><a href='<?php echo $_SERVER['REQUEST_URI'];?>#software-generated-forms'>Click here for more information</a></div>
   </div>
