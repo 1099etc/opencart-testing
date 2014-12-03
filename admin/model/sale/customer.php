@@ -541,7 +541,7 @@ class ModelSaleCustomer extends Model {
       $payroll_states = implode(',',$payroll_states);
     }
     else {
-      $payroll_states = implode(',',$payroll_states);
+      $payroll_states = $payroll_states;
     }      
     $this->db->query("UPDATE " . DB_PREFIX . "customer SET payroll_states = '" . $payroll_states . "' WHERE customer_id = '" . (int)$customer_id . "'");
   }
