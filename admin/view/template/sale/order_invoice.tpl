@@ -227,6 +227,7 @@ if($label == 'invoice') {
       }
     }
     $labelAddress = str_replace("\n",'<br />',$labelAddress);
+    $labelAddress = str_replace("  ",' ',$labelAddress);
 
 
 //echo "<pre>";
@@ -804,6 +805,7 @@ elseif($label == 'ship') {
     }
 
     $labelAddress = str_replace("\n",'<br />',$labelAddress);
+    $labelAddress = str_replace("  ",' ',$labelAddress);
 
     while($printed < $wanted) {
       // Now loop through each product.
