@@ -383,7 +383,7 @@ class ModelSaleCustomer extends Model {
 			$message  = sprintf($this->language->get('text_transaction_received'), $this->currency->format($amount, $this->config->get('config_currency'))) . "\n\n";
 			$message .= sprintf($this->language->get('text_transaction_total'), $this->currency->format($this->getTransactionTotal($customer_id)));
 								
-			$mail = new Mail();
+			/*$mail = new Mail();
 			$mail->protocol = $this->config->get('config_mail_protocol');
 			$mail->parameter = $this->config->get('config_mail_parameter');
 			$mail->hostname = $this->config->get('config_smtp_host');
@@ -396,7 +396,7 @@ class ModelSaleCustomer extends Model {
 			$mail->setSender($store_name);
 			$mail->setSubject(html_entity_decode(sprintf($this->language->get('text_transaction_subject'), $this->config->get('config_name')), ENT_QUOTES, 'UTF-8'));
 			$mail->setText(html_entity_decode($message, ENT_QUOTES, 'UTF-8'));
-			$mail->send();
+			$mail->send();*/
 		}
 	}
 	
@@ -540,6 +540,9 @@ class ModelSaleCustomer extends Model {
     if(count($payroll_states) > 1) {
       $payroll_states = implode(',',$payroll_states);
     }
+    else {
+      $payroll_states = implode(',',$payroll_states);
+    }      
     $this->db->query("UPDATE " . DB_PREFIX . "customer SET payroll_states = '" . $payroll_states . "' WHERE customer_id = '" . (int)$customer_id . "'");
   }
 
