@@ -30,25 +30,27 @@ Class ModelReportUpsworldship extends Model {
         $order['PHONE'] = preg_replace("/([0-9]{3})([0-9]{3})([0-9]{4})/", "($1) $2-$3", $order['PHONE']);
 */
       // setup the return array
+      if(strlen($order['SERIAL']) != 7) { $order['SERIAL'] = 'XXXXXXXX'; }
+      if(strlen($order['FIRM']) == 0) { $order['FIRM'] = $order['NAME']; }
       $returnArray[] = array(
-        'SN'         => $order['SERIAL'],
+        'SN'             => $order['SERIAL'],
         'COD'            => $order['COD'],
         'CODAMT'         => $order['CODAMT'],
         'SATDEL'         => $order['SATDEL'],
-        'NAME'           => '"' . $order['NAME'] . '"',
-        'FIRM'           => '"' . $order['FIRM'] . '"',
-        'ADDR'        => '"' . $order['ADDR'] . '"',
-        'CITY'           => '"' . $order['CITY'] . '"',
-        'STATE'          => '"' . $order['STATE'] . '"',
-        'ZIP'            => '"' . $order['ZIP'] . '"',
-        'PHONE'          => '"' . $order['PHONE'] . '"',
-        'NOTIFY1_OPTION' => '"' . $order['NOTIFY1_OPTION'] . '"',
+        'NAME'           => '"' . trim($order['NAME']) . '"',
+        'FIRM'           => '"' . trim($order['FIRM']) . '"',
+        'ADDR'           => '"' . trim($order['ADDR']) . '"',
+        'CITY'           => '"' . trim($order['CITY']) . '"',
+        'STATE'          => '"' . trim($order['STATE']) . '"',
+        'ZIP'            => '"' . trim($order['ZIP']) . '"',
+        'PHONE'          => '"' . trim($order['PHONE']) . '"',
+        'NOTIFY1_OPTION' => '"' . trim($order['NOTIFY1_OPTION']) . '"',
         'NOTIFY1_TYPE'   => $order['NOTIFY1_TYPE'],
         'EMAIL'          => $order['EMAIL'],
         'SERVICE'        => $order['SERVICE'],
         'PKGTYPE'        => $order['PKGTYPE'],
         'BILLOPT'        => $order['BILLOPT'],
-        'FROM_COMPANY'   => '"' . $order['FROM_COMPANY']. '"'
+        'FROM_COMPANY'   => '"' . trim($order['FROM_COMPANY']) . '"'
       );
 
     } // end foreach
