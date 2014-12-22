@@ -86,7 +86,11 @@ input[type='text'] { width: 100%; }
                   <?php  } ?></td>
               </tr>
               <tr>
-                <td><span class="required">*</span> <?php echo $entry_telephone; ?></td>
+                <td><span class="required">*</span> <?php echo $entry_telephone; ?>
+                  <?php if(isset($telephone)) { ?>
+                    <a href='callto: <?php echo preg_replace("/[^0-9,.]/","",$telephone); ?>'>[ CALL ]</a>
+                  <?php } ?>
+                </td>
                 <td><input type="text" name="telephone" value="<?php echo $telephone; ?>" />
                   <?php if ($error_telephone) { ?>
                   <span class="error"><?php echo $error_telephone; ?></span>

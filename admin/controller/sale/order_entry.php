@@ -4315,7 +4315,12 @@ $message = sprintf($this->language->get('text_order_success'), $order_id);
 				$this->model_sale_order_entry->addOrderHistory2($order_id, $data);
 				if ($data['notify']) {
 					$this->session->data['invoice_edit'] = 1;
-					$this->invoice($this->request->post['comment']);
+          if(isset($this->request->post['comment'])) {
+  					$this->invoice($this->request->post['comment']);
+          }
+          else {
+            $this->invoice('');
+          }
 					unset($this->session->data['invoice_edit']);
 				}
 				if ($order_is_paid) {
@@ -6692,23 +6697,23 @@ $message = sprintf($this->language->get('text_order_success'), $order_id);
       
       if($user_gid == '12' || $user_gid == '1') {
 
-			$totals_html .= "<optgroup label='" . $this->language->get('text_oecustom_payments') . "' style='background-color:#FF7A62'>";
-			foreach ($this->session->data['payment_methods'] as $payment_method) {
-				if ($payment_method['sort_order'] >= 99990) {
-					if (isset($this->session->data['payment_method'])) {
-						if ($payment_method['code'] == $this->session->data['payment_method']['code']) {
-							$totals_html .= "<option value='" . $payment_method['code'] . "' selected='selected' style='background-color:#FF7A62'>" . $payment_method['title'] . "</option>";
-						} else {
-							$totals_html .= "<option value='" . $payment_method['code'] . "' style='background-color:#FF7A62'>" . $payment_method['title'] . "</option>";
-						}
-					} else {
-						$totals_html .= "<option value='" . $payment_method['code'] . "' style='background-color:#FF7A62'>" . $payment_method['title'] . "</option>";
-					}
-				}
-			}
+  			$totals_html .= "<optgroup label='" . $this->language->get('text_oecustom_payments') . "' style='background-color:#FF7A62'>";
+	  		foreach ($this->session->data['payment_methods'] as $payment_method) {
+		  		if ($payment_method['sort_order'] >= 99990) {
+			  		if (isset($this->session->data['payment_method'])) {
+				  		if ($payment_method['code'] == $this->session->data['payment_method']['code']) {
+					  		$totals_html .= "<option value='" . $payment_method['code'] . "' selected='selected' style='background-color:#FF7A62'>" . $payment_method['title'] . "</option>";
+  						} else {
+	  						$totals_html .= "<option value='" . $payment_method['code'] . "' style='background-color:#FF7A62'>" . $payment_method['title'] . "</option>";
+		  				}
+			  		} else {
+				  		$totals_html .= "<option value='" . $payment_method['code'] . "' style='background-color:#FF7A62'>" . $payment_method['title'] . "</option>";
+					  }
+  				}
+	  		}
 
-			$totals_html .= "</optgroup>";
-} // End if
+		  	$totals_html .= "</optgroup>";
+      } // End if
 
 			$totals_html .= "<option value=''></option>";
 			$totals_html .= "<optgroup label='" . $this->language->get('text_your_payments') . "'>";
@@ -7031,7 +7036,7 @@ $message = sprintf($this->language->get('text_order_success'), $order_id);
 			$comments_html .= "</tr>";
 			$comments_html .= "<tr>";
 			$comments_html .= "<td style='border: none !important;'>" . $this->language->get('entry_comment') . "</td>";
-			$comments_html .= "<td style='border: none !important;'><textarea id='comment' class='comment-box' name='comment' cols='75' rows='4'>" . $comment . "</textarea></td>";
+			$comments_html .= "<td style='border: none !important;'><textarea id='comment' class='comment-box' name='comment' cols='75' rows='4' disabled='disabled'>" . $comment . "</textarea></td>";
 			$comments_html .= "</tr>";
 			if (isset($this->session->data['edit_order'])) {
 				$comments_html .= "<tr>";

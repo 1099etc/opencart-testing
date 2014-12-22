@@ -74,7 +74,7 @@ $("#serialSearch").keydown(function(event){
   <input type='hidden' name='route' value='account/amsupdate/submit' />
       <!-- <label for='searchSerial'>Enter Your 8 Character Serial Number : </label> -->
       <h3 style='padding:0px; margin: 0px;'>Download Software</h3>
-      <label for='searchSerial'>To access your downloads, please enter your 8 character serial number:</label><br />
+      <label for='searchSerial'>Enter your 8 character serial number for the year you wish to download.</label><br />
       <input type='text' maxlength='8' name='serialSearch' id='serialSearch' size='8' class='uppercase' value='<?php echo $serial; ?>' />
       <input type='submit' value='Go!' id='submitSerialSearch' />
 </form>

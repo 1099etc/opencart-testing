@@ -516,9 +516,10 @@ class ModelSaleOrderEntry extends Model {
 			$override_tax = '';
 		}
 
+// working here
     $name = $this->db->query("SELECT firstname, lastname FROM " . DB_PREFIX . "customer WHERE customer_id =" . (int)$data['customer_id'] . "");
-    $data['firstname'] = $name['firstname'];
-    $data['lastname'] = $name['lastname'];
+      $data['firstname'] = $name->row['firstname'];
+      $data['lastname'] = $name->row['lastname'];
                         
 
 		if (version_compare(VERSION, '1.5.2.1', '>')) {

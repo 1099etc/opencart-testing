@@ -91,7 +91,12 @@
           </tr>
           <tr>
             <td><?php echo $text_telephone; ?></td>
-            <td><?php echo $telephone; ?></td>
+            <td>
+              <?php echo $telephone; ?> - 
+              <?php if(isset($telephone)) { ?>
+                <a href='callto: <?php echo preg_replace("/[^0-9,.]/","",$telephone); ?>'>[ CALL ]</a>
+              <?php } ?>
+            </td>
           </tr>
           <?php if ($fax) { ?>
           <tr>

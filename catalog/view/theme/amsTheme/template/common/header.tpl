@@ -40,6 +40,10 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2014-03-28T16:45:41+00:00" />
 
+<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+<META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT">
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+
 <?php if ($description) { ?>
 <meta name="description" content="<?php echo $description; ?>" />
 <?php } ?>

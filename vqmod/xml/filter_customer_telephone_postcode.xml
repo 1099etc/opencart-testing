@@ -141,7 +141,11 @@
 		</operation>
               <operation >
 			<search position="before"><![CDATA[<td class="left"><?php echo $customer['customer_group']; ?></td>]]></search>
-			<add><![CDATA[<td class="left"><?php echo $customer['telephone']; ?></td>
+			<add><![CDATA[
+      <?php $XPhone = $customer['telephone'];
+      $XPhone = preg_replace("/[^0-9,.]/",'',$XPhone);
+      ?>
+                                      <td class="left"><a href='callto:<?php echo $XPhone; ?>'><?php echo $customer['telephone']; ?></a></td>
                                       <td class="left"><?php echo $customer['postcode']; ?></td>
                                       <td class="left"><?php echo $customer['company']; ?></td>]]></add>
 		</operation>            
