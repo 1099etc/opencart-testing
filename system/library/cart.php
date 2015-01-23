@@ -254,7 +254,7 @@ class Cart {
   	public function add($product_id, $qty = 1, $option = array()) {
 
       $flagged = 0;
-
+/*
       $Q = "select model from " . DB_PREFIX . "product where product_id ='" . (int)$product_id . "'";
       $findModelQ = $this->db->query($Q);
       if(substr($findModelQ->row['model'],0,3) == 'upg') {
@@ -277,12 +277,13 @@ class Cart {
         }
       }
       else {
+      */
        	if (!$option) {
         		$key = (int)$product_id;
       	} else {
       	  	$key = (int)$product_id . ':' . base64_encode(serialize($option));
     	  }
-      }
+      //}
 
   		if ((int)$qty && ((int)$qty > 0)) {
     		if (!isset($this->session->data['cart'][$key])) {
